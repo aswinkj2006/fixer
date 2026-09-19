@@ -23,6 +23,9 @@
   - **Tier 2 (Per-Machine Instance Memory)**: Strict cryptographic/logical isolation per physical asset ID (`tier2__M_01`, `tier2__M_02`, etc.). High-temperature grease fixes on Robot #1 never leak into or pollute the diagnostic context of Mill #2.
 - **🔄 Instant Continual Learning**: Closing a work order in the web console or Slack instantly indexes the resolution card into that machine's Tier 2 brain. Querying the same symptom seconds later immediately returns the past repair history.
 - **📊 Weakest-Link Prognostics (ISO 10816)**: Multi-sensor health scoring (0–100) where a critical vibration or torque anomaly triggers an alert regardless of nominal thermal signals.
+- **⏱️ ISO 14224 Fleet Reliability & Financial ROI**: Automated plant availability %, MTBF (operating hours), MTTR (repair turnaround), and downtime cost avoided ($18,500/hr industrial benchmark).
+- **🎙️ Live Multimodal Input**: Web Audio `MediaRecorder` microphone recording for hands-free technician voice reports + quick-select industrial defect sample photo gallery.
+- **📄 Shift Handover Reports**: Instant one-click export of formal ISO 14224 shift handover and diagnostic audit documentation.
 - **💬 Slack Bolt Socket Mode Integration**: Interactive Block Kit escalation cards, automated technician specialty routing, bi-directional thread syncing, and one-click "Mark Resolved" workflow.
 
 ---

@@ -13,7 +13,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-import type { MachineDetailData, SensorDataPoint } from '../types';
+import type { MachineDetailData, SensorDataPoint, MachineReliability } from '../types';
 import { MachineChatWindow } from '../components/MachineChatWindow';
 
 interface MachineDetailProps {
@@ -25,6 +25,7 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
   const machineId = id || 'M-01';
 
   const [machineData, setMachineData] = useState<MachineDetailData | null>(null);
+  const [reliability, setReliability] = useState<MachineReliability | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedSensor, setSelectedSensor] = useState<string>('');
   const [isExporting, setIsExporting] = useState(false);
@@ -53,11 +54,21 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
 
   const fetchMachine = async () => {
     try {
-      const res = await axios.get(`/api/machines/${machineId}`);
-      setMachineData(res.data);
-      if (!selectedSensor && res.data.current_readings) {
-        const first = Object.keys(res.data.current_readings).find((k) => k !== 'cycle_count') || Object.keys(res.data.current_readings)[0];
-        setSelectedSensor(first || '');
+      const [resMachine, resRel] = await Promise.allSettled([
+        axios.get(`/api/machines/${machineId}`),
+        axios.get(`/api/machines/${machineId}/reliability`),
+      ]);
+
+      if (resMachine.status === 'fulfilled') {
+        setMachineData(resMachine.value.data);
+        if (!selectedSensor && resMachine.value.data.current_readings) {
+          const first = Object.keys(resMachine.value.data.current_readings).find((k) => k !== 'cycle_count') || Object.keys(resMachine.value.data.current_readings)[0];
+          setSelectedSensor(first || '');
+        }
+      }
+
+      if (resRel.status === 'fulfilled') {
+        setReliability(resRel.value.data);
       }
     } catch (e) {
       console.error(`Failed to load machine ${machineId}:`, e);
@@ -271,6 +282,44 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
             <span>Avail: <strong>96%</strong></span>
             <span>Perf: <strong>98%</strong></span>
             <span>Qual: <strong>99.4%</strong></span>
+          </div>
+        </div>
+
+        {/* ISO 14224 Reliability Profile Card */}
+        <div className="glass-panel" style={{ padding: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              ISO 14224 Reliability
+            </span>
+            <span style={{
+              fontSize: '0.68rem',
+              color: '#34d399',
+              background: 'rgba(52, 211, 153, 0.12)',
+              border: '1px solid rgba(52, 211, 153, 0.25)',
+              padding: '2px 8px',
+              borderRadius: '6px',
+            }}>
+              {reliability ? `${reliability.availability_pct}% Avail` : '100% Avail'}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '8px' }}>
+            <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#f8fafc' }}>
+              {reliability ? `${reliability.mtbf_hours}h` : '720h'}
+            </span>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>MTBF</span>
+            <span style={{ fontSize: '0.9rem', color: '#64748b', margin: '0 4px' }}>|</span>
+            <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fbbf24' }}>
+              {reliability ? `${reliability.mttr_hours}h` : '1.0h'}
+            </span>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>MTTR</span>
+          </div>
+
+          <p style={{ fontSize: '0.76rem', color: '#34d399', marginTop: '8px', margin: 0 }}>
+            💰 <strong>${reliability ? reliability.cost_avoided_usd.toLocaleString() : '0'}</strong> downtime cost avoided
+          </p>
+          <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '10px' }}>
+            {reliability ? `${reliability.total_downtime_hours}h downtime (${reliability.failure_count} incidents in ${reliability.window_days}d)` : '90-day operational evaluation window'}
           </div>
         </div>
       </section>

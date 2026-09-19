@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import axios from 'axios';
-import type { Machine, FleetLeaderboardItem } from '../types';
+import type { Machine, FleetLeaderboardItem, FleetReliability } from '../types';
 import { MachineCard } from '../components/MachineCard';
 import { TriggerModal } from '../components/TriggerModal';
 
@@ -20,6 +20,9 @@ export const Dashboard: FC<DashboardProps> = ({
 }) => {
   const [leaderboard, setLeaderboard] = useState<FleetLeaderboardItem[]>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false);
+  const [reliability, setReliability] = useState<FleetReliability | null>(null);
+  const [reliabilityWindow, setReliabilityWindow] = useState<number>(90);
+  const [loadingReliability, setLoadingReliability] = useState(false);
 
   const fetchLeaderboard = async () => {
     setLoadingLeaderboard(true);
@@ -33,9 +36,22 @@ export const Dashboard: FC<DashboardProps> = ({
     }
   };
 
+  const fetchReliability = async (days = reliabilityWindow) => {
+    setLoadingReliability(true);
+    try {
+      const res = await axios.get(`/api/fleet/reliability?window_days=${days}`);
+      setReliability(res.data);
+    } catch (e) {
+      console.warn('Failed to load fleet reliability:', e);
+    } finally {
+      setLoadingReliability(false);
+    }
+  };
+
   useEffect(() => {
     fetchLeaderboard();
-  }, []);
+    fetchReliability(reliabilityWindow);
+  }, [reliabilityWindow]);
 
   // Compute fleet KPIs
   const totalMachines = machines.length;
@@ -165,6 +181,241 @@ export const Dashboard: FC<DashboardProps> = ({
         {machines.map((machine) => (
           <MachineCard key={machine.machine_id} machine={machine} />
         ))}
+      </section>
+
+      {/* ISO 14224 Fleet Reliability & Financial Impact */}
+      <section className="glass-panel" style={{ padding: '28px', marginBottom: '40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '1.25rem' }}>⏱️</span>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.01em', margin: 0 }}>
+                ISO 14224 Fleet Reliability & Financial Impact
+              </h2>
+            </div>
+            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0, marginTop: '4px' }}>
+              Automated MTBF, MTTR, Plant Availability %, and Downtime Cost Avoidance calculations
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>ROLLING WINDOW:</span>
+            {[30, 90, 180].map((days) => (
+              <button
+                key={days}
+                onClick={() => setReliabilityWindow(days)}
+                style={{
+                  padding: '4px 12px',
+                  borderRadius: '6px',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: reliabilityWindow === days ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                  background: reliabilityWindow === days ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                  color: reliabilityWindow === days ? '#38bdf8' : '#94a3b8',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {days}D
+              </button>
+            ))}
+            <button
+              className="btn-secondary"
+              onClick={() => fetchReliability(reliabilityWindow)}
+              disabled={loadingReliability}
+              style={{ padding: '4px 12px', fontSize: '0.78rem', marginLeft: '6px' }}
+            >
+              {loadingReliability ? '...' : '↻'}
+            </button>
+          </div>
+        </div>
+
+        {/* 4 Reliability Metric Cards */}
+        {reliability ? (
+          <>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '16px',
+              marginBottom: '24px',
+            }}>
+              <div style={{
+                background: 'rgba(0, 0, 0, 0.3)',
+                padding: '18px 20px',
+                borderRadius: '10px',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+              }}>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Plant Availability
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <span style={{
+                    fontSize: '2rem',
+                    fontWeight: 800,
+                    color: reliability.fleet_availability_pct >= 95 ? '#10b981' : reliability.fleet_availability_pct >= 90 ? '#f59e0b' : '#ef4444',
+                  }}>
+                    {reliability.fleet_availability_pct}%
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                    ({reliability.fleet_operating_hours} hrs runtime)
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '4px 0 0 0' }}>
+                  {reliability.fleet_downtime_hours} hrs recorded downtime
+                </p>
+              </div>
+
+              <div style={{
+                background: 'rgba(0, 0, 0, 0.3)',
+                padding: '18px 20px',
+                borderRadius: '10px',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+              }}>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Fleet MTBF (Mean Time Between Failures)
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#38bdf8' }}>
+                    {reliability.fleet_mtbf_hours}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>hours</span>
+                </div>
+                <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '4px 0 0 0' }}>
+                  {reliability.fleet_failures_count} failure events in {reliability.window_days}d
+                </p>
+              </div>
+
+              <div style={{
+                background: 'rgba(0, 0, 0, 0.3)',
+                padding: '18px 20px',
+                borderRadius: '10px',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+              }}>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Fleet MTTR (Mean Time To Repair)
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <span style={{
+                    fontSize: '2rem',
+                    fontWeight: 800,
+                    color: reliability.fleet_mttr_hours <= 2.0 ? '#34d399' : '#fbbf24',
+                  }}>
+                    {reliability.fleet_mttr_hours}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>hours</span>
+                </div>
+                <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '4px 0 0 0' }}>
+                  Turnaround per closed ticket
+                </p>
+              </div>
+
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.08)',
+                padding: '18px 20px',
+                borderRadius: '10px',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+              }}>
+                <span style={{ fontSize: '0.72rem', color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                  Downtime Cost Avoided
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#34d399' }}>
+                    ${reliability.total_cost_avoided_usd.toLocaleString()}
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.72rem', color: '#94a3b8', margin: '4px 0 0 0' }}>
+                  At $18.5k/hr downtime + AI fast triage
+                </p>
+              </div>
+            </div>
+
+            {/* Recent Downtime Log */}
+            <div>
+              <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '12px' }}>
+                Recent Plant Downtime & Incident Log
+              </h3>
+              {reliability.recent_fleet_events.length === 0 ? (
+                <p style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', margin: 0 }}>
+                  No downtime events logged in the selected {reliability.window_days}-day period.
+                </p>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    fontSize: '0.8rem',
+                    textAlign: 'left',
+                  }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#94a3b8' }}>
+                        <th style={{ padding: '8px 12px' }}>Asset</th>
+                        <th style={{ padding: '8px 12px' }}>Fault Code</th>
+                        <th style={{ padding: '8px 12px' }}>Symptom</th>
+                        <th style={{ padding: '8px 12px' }}>Downtime</th>
+                        <th style={{ padding: '8px 12px' }}>Severity</th>
+                        <th style={{ padding: '8px 12px' }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reliability.recent_fleet_events.slice(0, 6).map((evt) => (
+                        <tr key={evt.ticket_id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                          <td style={{ padding: '10px 12px' }}>
+                            <span style={{
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              color: '#38bdf8',
+                              background: 'rgba(6, 182, 212, 0.1)',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                            }}>
+                              {evt.machine_id}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: '#e2e8f0' }}>
+                            {evt.failure_code || 'N/A'}
+                          </td>
+                          <td style={{ padding: '10px 12px', color: '#cbd5e1', maxWidth: '300px' }}>
+                            {evt.symptom}
+                          </td>
+                          <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: '#f59e0b', fontWeight: 600 }}>
+                            {evt.duration_hours} hrs
+                          </td>
+                          <td style={{ padding: '10px 12px' }}>
+                            <span style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              padding: '2px 8px',
+                              borderRadius: '10px',
+                              background: evt.severity === 'critical' ? 'rgba(239, 68, 68, 0.2)' : evt.severity === 'high' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.15)',
+                              color: evt.severity === 'critical' ? '#f87171' : evt.severity === 'high' ? '#fbbf24' : '#60a5fa',
+                            }}>
+                              {evt.severity}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 12px' }}>
+                            <span style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 600,
+                              color: evt.status === 'Resolved' ? '#34d399' : '#38bdf8',
+                            }}>
+                              ● {evt.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <p style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', margin: 0 }}>
+            Loading fleet reliability analytics...
+          </p>
+        )}
       </section>
 
       {/* Fleet Recurring Faults Leaderboard */}

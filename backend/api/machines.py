@@ -18,6 +18,7 @@ from backend.simulation.simulator import get_current_readings
 from backend.simulation.failure_triggers import get_all_trigger_states
 from backend.health.scoring import compute_health_score, DEFAULT_BASELINES
 from backend.health.rul import estimate_rul_from_db, estimate_rul_from_readings
+from backend.health.reliability import compute_machine_reliability, compute_fleet_reliability
 from backend.rag.recurring_faults import detect_recurring_faults, get_fleet_recurring_leaderboard
 
 router = APIRouter()
@@ -295,3 +296,27 @@ async def get_machine_report(machine_id: str):
             "cluster_count": len(clusters),
             "formatted_report": formatted_text,
         }
+
+
+@router.get("/fleet/reliability")
+async def get_fleet_reliability_metrics(window_days: int = 90):
+    """
+    Fleet-wide ISO 14224 reliability metrics (MTBF, MTTR, availability %, cost savings).
+    """
+    from backend.main import AsyncSessionLocal
+    async with AsyncSessionLocal() as db:
+        return await compute_fleet_reliability(db=db, window_days=window_days)
+
+
+@router.get("/machines/{machine_id}/reliability")
+async def get_machine_reliability_metrics(machine_id: str, window_days: int = 90):
+    """
+    Asset-specific ISO 14224 reliability and downtime history.
+    """
+    from backend.main import AsyncSessionLocal
+    async with AsyncSessionLocal() as db:
+        machine = await db.get(Machine, machine_id)
+        if not machine:
+            raise HTTPException(status_code=404, detail=f"Machine {machine_id} not found")
+        return await compute_machine_reliability(machine_id=machine_id, db=db, window_days=window_days)
+

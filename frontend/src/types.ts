@@ -112,3 +112,45 @@ export interface SensorDataPoint {
   timestamp: number;
   [sensorKey: string]: number | string;
 }
+
+export interface DowntimeEvent {
+  ticket_id: string;
+  machine_id: string;
+  opened_at: string;
+  closed_at: string | null;
+  duration_hours: number;
+  status: string;
+  severity: string;
+  failure_code: string;
+  symptom: string;
+}
+
+export interface MachineReliability {
+  machine_id: string;
+  window_days: number;
+  total_window_hours: number;
+  operating_hours: number;
+  total_downtime_hours: number;
+  failure_count: number;
+  resolved_count: number;
+  mtbf_hours: number;
+  mttr_hours: number;
+  availability_pct: number;
+  cost_avoided_usd: number;
+  recent_downtime_events: DowntimeEvent[];
+}
+
+export interface FleetReliability {
+  window_days: number;
+  total_machines: number;
+  fleet_operating_hours: number;
+  fleet_downtime_hours: number;
+  fleet_failures_count: number;
+  fleet_resolved_count: number;
+  fleet_mtbf_hours: number;
+  fleet_mttr_hours: number;
+  fleet_availability_pct: number;
+  total_cost_avoided_usd: number;
+  recent_fleet_events: DowntimeEvent[];
+  machine_breakdown: Record<string, MachineReliability>;
+}
