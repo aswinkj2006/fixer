@@ -73,18 +73,18 @@ export const Dashboard: FC<DashboardProps> = ({
         marginBottom: '36px',
       }}>
         <div className="glass-panel" style={{ padding: '22px 24px' }}>
-          <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
             Fleet Health Index
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
             <span style={{
               fontSize: '2.2rem',
               fontWeight: 800,
-              color: avgHealth >= 85 ? '#10b981' : avgHealth >= 60 ? '#f59e0b' : '#ef4444',
+              color: avgHealth >= 85 ? 'var(--status-healthy)' : avgHealth >= 60 ? 'var(--status-warning)' : 'var(--status-critical)',
             }}>
               {avgHealth}%
             </span>
-            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {avgHealth >= 85 ? 'Nominal Fleet Condition' : 'Anomalies Detected'}
             </span>
           </div>
@@ -92,64 +92,64 @@ export const Dashboard: FC<DashboardProps> = ({
             marginTop: '10px',
             height: '4px',
             borderRadius: '2px',
-            background: 'rgba(255, 255, 255, 0.08)',
+            background: 'var(--border-card)',
             overflow: 'hidden',
           }}>
             <div style={{
               width: `${avgHealth}%`,
               height: '100%',
-              background: avgHealth >= 85 ? '#10b981' : avgHealth >= 60 ? '#f59e0b' : '#ef4444',
+              background: avgHealth >= 85 ? 'var(--status-healthy)' : avgHealth >= 60 ? 'var(--status-warning)' : 'var(--status-critical)',
             }} />
           </div>
         </div>
 
         <div className="glass-panel" style={{ padding: '22px 24px' }}>
-          <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
             Overall Equipment Effectiveness (OEE)
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-            <span style={{ fontSize: '2.2rem', fontWeight: 800, color: '#38bdf8' }}>
+            <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-blue)' }}>
               {avgOee}%
             </span>
-            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Target: 85%+ (World Class)</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Target: 85%+ (World Class)</span>
           </div>
-          <p style={{ fontSize: '0.74rem', color: '#64748b', margin: 0, marginTop: '8px' }}>
+          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, marginTop: '8px' }}>
             Availability × Performance × Quality composite
           </p>
         </div>
 
         <div className="glass-panel" style={{ padding: '22px 24px' }}>
-          <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
             Active Anomalies & Injections
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
             <span style={{
               fontSize: '2.2rem',
               fontWeight: 800,
-              color: activeAlerts > 0 ? '#ef4444' : '#34d399',
+              color: activeAlerts > 0 ? 'var(--status-critical)' : 'var(--status-healthy)',
             }}>
               {activeAlerts}
             </span>
-            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {activeAlerts > 0 ? 'Urgent Review Required' : 'Zero Active Faults'}
             </span>
           </div>
-          <p style={{ fontSize: '0.74rem', color: '#64748b', margin: 0, marginTop: '8px' }}>
+          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, marginTop: '8px' }}>
             Monitored by local Ornstein-Uhlenbeck sensors
           </p>
         </div>
 
         <div className="glass-panel" style={{ padding: '22px 24px' }}>
-          <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
             Monitored Asset Fleet
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-            <span style={{ fontSize: '2.2rem', fontWeight: 800, color: '#a78bfa' }}>
+            <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-violet)' }}>
               4 / 4
             </span>
-            <span style={{ fontSize: '0.8rem', color: '#34d399' }}>● 100% Online</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--status-healthy)', fontWeight: 600 }}>● 100% Online</span>
           </div>
-          <p style={{ fontSize: '0.74rem', color: '#64748b', margin: 0, marginTop: '8px' }}>
+          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, marginTop: '8px' }}>
             FANUC Robot, Haas CNC, Conveyor, Metrology
           </p>
         </div>
@@ -158,10 +158,10 @@ export const Dashboard: FC<DashboardProps> = ({
       {/* Fleet Machinery Grid Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
             Fleet Condition & Telemetry Grid
           </h2>
-          <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
             Real-time multi-sensor prognostic scoring per machine instance
           </p>
         </div>
@@ -189,30 +189,30 @@ export const Dashboard: FC<DashboardProps> = ({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={{ fontSize: '1.25rem' }}>⏱️</span>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.01em', margin: 0 }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', margin: 0 }}>
                 ISO 14224 Fleet Reliability & Financial Impact
               </h2>
             </div>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0, marginTop: '4px' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, marginTop: '4px' }}>
               Automated MTBF, MTTR, Plant Availability %, and Downtime Cost Avoidance calculations
             </p>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>ROLLING WINDOW:</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>ROLLING WINDOW:</span>
             {[30, 90, 180].map((days) => (
               <button
                 key={days}
                 onClick={() => setReliabilityWindow(days)}
                 style={{
                   padding: '4px 12px',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--btn-radius)',
                   fontSize: '0.78rem',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  border: reliabilityWindow === days ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
-                  background: reliabilityWindow === days ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                  color: reliabilityWindow === days ? '#38bdf8' : '#94a3b8',
+                  border: reliabilityWindow === days ? '1px solid var(--accent-blue)' : '1px solid var(--border-card)',
+                  background: reliabilityWindow === days ? 'rgba(37, 99, 235, 0.15)' : 'var(--bg-card-subtle)',
+                  color: reliabilityWindow === days ? 'var(--accent-blue)' : 'var(--text-secondary)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -240,71 +240,71 @@ export const Dashboard: FC<DashboardProps> = ({
               marginBottom: '24px',
             }}>
               <div style={{
-                background: 'rgba(0, 0, 0, 0.3)',
+                background: 'var(--bg-card-subtle)',
                 padding: '18px 20px',
-                borderRadius: '10px',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: 'var(--btn-radius)',
+                border: '1px solid var(--border-card)',
               }}>
-                <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
                   Plant Availability
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
                   <span style={{
                     fontSize: '2rem',
                     fontWeight: 800,
-                    color: reliability.fleet_availability_pct >= 95 ? '#10b981' : reliability.fleet_availability_pct >= 90 ? '#f59e0b' : '#ef4444',
+                    color: reliability.fleet_availability_pct >= 95 ? 'var(--status-healthy)' : reliability.fleet_availability_pct >= 90 ? 'var(--status-warning)' : 'var(--status-critical)',
                   }}>
                     {reliability.fleet_availability_pct}%
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     ({reliability.fleet_operating_hours} hrs runtime)
                   </span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '4px 0 0 0' }}>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                   {reliability.fleet_downtime_hours} hrs recorded downtime
                 </p>
               </div>
 
               <div style={{
-                background: 'rgba(0, 0, 0, 0.3)',
+                background: 'var(--bg-card-subtle)',
                 padding: '18px 20px',
-                borderRadius: '10px',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: 'var(--btn-radius)',
+                border: '1px solid var(--border-card)',
               }}>
-                <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Fleet MTBF (Mean Time Between Failures)
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                  Fleet MTBF (Operating Hours)
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#38bdf8' }}>
+                  <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-blue)' }}>
                     {reliability.fleet_mtbf_hours}
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>hours</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>hours</span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '4px 0 0 0' }}>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                   {reliability.fleet_failures_count} failure events in {reliability.window_days}d
                 </p>
               </div>
 
               <div style={{
-                background: 'rgba(0, 0, 0, 0.3)',
+                background: 'var(--bg-card-subtle)',
                 padding: '18px 20px',
-                borderRadius: '10px',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: 'var(--btn-radius)',
+                border: '1px solid var(--border-card)',
               }}>
-                <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Fleet MTTR (Mean Time To Repair)
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                  Fleet MTTR (Repair Turnaround)
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
                   <span style={{
                     fontSize: '2rem',
                     fontWeight: 800,
-                    color: reliability.fleet_mttr_hours <= 2.0 ? '#34d399' : '#fbbf24',
+                    color: reliability.fleet_mttr_hours <= 2.0 ? 'var(--status-healthy)' : 'var(--status-warning)',
                   }}>
                     {reliability.fleet_mttr_hours}
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>hours</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>hours</span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '4px 0 0 0' }}>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                   Turnaround per closed ticket
                 </p>
               </div>
@@ -312,18 +312,18 @@ export const Dashboard: FC<DashboardProps> = ({
               <div style={{
                 background: 'rgba(16, 185, 129, 0.08)',
                 padding: '18px 20px',
-                borderRadius: '10px',
+                borderRadius: 'var(--btn-radius)',
                 border: '1px solid rgba(16, 185, 129, 0.25)',
               }}>
-                <span style={{ fontSize: '0.72rem', color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--status-healthy)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Downtime Cost Avoided
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#34d399' }}>
+                  <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--status-healthy)' }}>
                     ${reliability.total_cost_avoided_usd.toLocaleString()}
                   </span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: '#94a3b8', margin: '4px 0 0 0' }}>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                   At $18.5k/hr downtime + AI fast triage
                 </p>
               </div>
@@ -331,11 +331,11 @@ export const Dashboard: FC<DashboardProps> = ({
 
             {/* Recent Downtime Log */}
             <div>
-              <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px' }}>
                 Recent Plant Downtime & Incident Log
               </h3>
               {reliability.recent_fleet_events.length === 0 ? (
-                <p style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', margin: 0 }}>
+                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
                   No downtime events logged in the selected {reliability.window_days}-day period.
                 </p>
               ) : (
@@ -347,7 +347,7 @@ export const Dashboard: FC<DashboardProps> = ({
                     textAlign: 'left',
                   }}>
                     <thead>
-                      <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#94a3b8' }}>
+                      <tr style={{ borderBottom: '1px solid var(--table-border)', color: 'var(--text-muted)' }}>
                         <th style={{ padding: '8px 12px' }}>Asset</th>
                         <th style={{ padding: '8px 12px' }}>Fault Code</th>
                         <th style={{ padding: '8px 12px' }}>Symptom</th>
@@ -358,27 +358,28 @@ export const Dashboard: FC<DashboardProps> = ({
                     </thead>
                     <tbody>
                       {reliability.recent_fleet_events.slice(0, 6).map((evt) => (
-                        <tr key={evt.ticket_id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                        <tr key={evt.ticket_id} style={{ borderBottom: '1px solid var(--table-border)' }}>
                           <td style={{ padding: '10px 12px' }}>
                             <span style={{
                               fontFamily: 'var(--font-mono)',
                               fontSize: '0.75rem',
                               fontWeight: 700,
-                              color: '#38bdf8',
-                              background: 'rgba(6, 182, 212, 0.1)',
+                              color: 'var(--accent-blue)',
+                              background: 'var(--bg-card-subtle)',
                               padding: '2px 6px',
-                              borderRadius: '4px',
+                              borderRadius: 'var(--btn-radius)',
+                              border: '1px solid var(--border-card)',
                             }}>
                               {evt.machine_id}
                             </span>
                           </td>
-                          <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: '#e2e8f0' }}>
+                          <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
                             {evt.failure_code || 'N/A'}
                           </td>
-                          <td style={{ padding: '10px 12px', color: '#cbd5e1', maxWidth: '300px' }}>
+                          <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', maxWidth: '300px' }}>
                             {evt.symptom}
                           </td>
-                          <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: '#f59e0b', fontWeight: 600 }}>
+                          <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: 'var(--status-warning)', fontWeight: 600 }}>
                             {evt.duration_hours} hrs
                           </td>
                           <td style={{ padding: '10px 12px' }}>
@@ -387,9 +388,10 @@ export const Dashboard: FC<DashboardProps> = ({
                               fontWeight: 700,
                               textTransform: 'uppercase',
                               padding: '2px 8px',
-                              borderRadius: '10px',
-                              background: evt.severity === 'critical' ? 'rgba(239, 68, 68, 0.2)' : evt.severity === 'high' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.15)',
-                              color: evt.severity === 'critical' ? '#f87171' : evt.severity === 'high' ? '#fbbf24' : '#60a5fa',
+                              borderRadius: 'var(--btn-radius)',
+                              background: evt.severity === 'critical' ? 'rgba(239, 68, 68, 0.15)' : evt.severity === 'high' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(37, 99, 235, 0.12)',
+                              color: evt.severity === 'critical' ? 'var(--status-critical)' : evt.severity === 'high' ? 'var(--status-warning)' : 'var(--accent-blue)',
+                              border: `1px solid ${evt.severity === 'critical' ? 'rgba(239, 68, 68, 0.3)' : evt.severity === 'high' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(37, 99, 235, 0.25)'}`,
                             }}>
                               {evt.severity}
                             </span>
@@ -398,7 +400,7 @@ export const Dashboard: FC<DashboardProps> = ({
                             <span style={{
                               fontSize: '0.72rem',
                               fontWeight: 600,
-                              color: evt.status === 'Resolved' ? '#34d399' : '#38bdf8',
+                              color: evt.status === 'Resolved' ? 'var(--status-healthy)' : 'var(--accent-blue)',
                             }}>
                               ● {evt.status}
                             </span>
@@ -412,7 +414,7 @@ export const Dashboard: FC<DashboardProps> = ({
             </div>
           </>
         ) : (
-          <p style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', margin: 0 }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
             Loading fleet reliability analytics...
           </p>
         )}
@@ -424,11 +426,11 @@ export const Dashboard: FC<DashboardProps> = ({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={{ fontSize: '1.2rem' }}>🧠</span>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.01em', margin: 0 }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', margin: 0 }}>
                 Fleet Recurring Faults Leaderboard (Tier 2 Semantic Memory)
               </h2>
             </div>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0, marginTop: '4px' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, marginTop: '4px' }}>
               Surfaces patterns across the plant and identifies the longest-lasting historical remedies
             </p>
           </div>
@@ -445,7 +447,7 @@ export const Dashboard: FC<DashboardProps> = ({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {leaderboard.length === 0 ? (
-            <p style={{ fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic', padding: '16px 0' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '16px 0' }}>
               No recurring fault clusters detected yet across Tier 2 collections.
             </p>
           ) : (
@@ -454,9 +456,9 @@ export const Dashboard: FC<DashboardProps> = ({
                 key={`${item.machine_id}-${item.rank}`}
                 style={{
                   padding: '16px 20px',
-                  borderRadius: '12px',
-                  background: 'rgba(0, 0, 0, 0.25)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  borderRadius: 'var(--btn-radius)',
+                  background: 'var(--bg-card-subtle)',
+                  border: '1px solid var(--border-card)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -467,10 +469,10 @@ export const Dashboard: FC<DashboardProps> = ({
                   <div style={{
                     width: '32px',
                     height: '32px',
-                    borderRadius: '8px',
-                    background: item.rank === 1 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(99, 102, 241, 0.15)',
-                    color: item.rank === 1 ? '#f87171' : '#a5b4fc',
-                    border: `1px solid ${item.rank === 1 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(99, 102, 241, 0.25)'}`,
+                    borderRadius: 'var(--btn-radius)',
+                    background: item.rank === 1 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(37, 99, 235, 0.12)',
+                    color: item.rank === 1 ? 'var(--status-critical)' : 'var(--accent-blue)',
+                    border: `1px solid ${item.rank === 1 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(37, 99, 235, 0.25)'}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -486,24 +488,25 @@ export const Dashboard: FC<DashboardProps> = ({
                         fontFamily: 'var(--font-mono)',
                         fontSize: '0.75rem',
                         fontWeight: 700,
-                        color: '#38bdf8',
-                        background: 'rgba(6, 182, 212, 0.1)',
+                        color: 'var(--accent-blue)',
+                        background: 'var(--bg-card-subtle)',
                         padding: '2px 6px',
-                        borderRadius: '4px',
+                        borderRadius: 'var(--btn-radius)',
+                        border: '1px solid var(--border-card)',
                       }}>
                         {item.machine_id}
                       </span>
-                      <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                      <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                         {item.pattern_name}
                       </h3>
                       {item.failure_code && (
-                        <span style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                           [{item.failure_code}]
                         </span>
                       )}
                     </div>
-                    <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: 0 }}>
-                      💡 Longest-Lasting Fix: <strong style={{ color: '#34d399' }}>{item.longest_lasting_fix}</strong>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
+                      💡 Longest-Lasting Fix: <strong style={{ color: 'var(--status-healthy)' }}>{item.longest_lasting_fix}</strong>
                     </p>
                   </div>
                 </div>
@@ -512,11 +515,11 @@ export const Dashboard: FC<DashboardProps> = ({
                   <span style={{
                     fontSize: '0.76rem',
                     fontWeight: 700,
-                    background: 'rgba(245, 158, 11, 0.15)',
-                    color: '#fbbf24',
+                    background: 'rgba(245, 158, 11, 0.12)',
+                    color: 'var(--status-warning)',
                     padding: '4px 10px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                    borderRadius: 'var(--btn-radius)',
+                    border: '1px solid rgba(245, 158, 11, 0.25)',
                   }}>
                     {item.occurrence_count} Occurrences
                   </span>

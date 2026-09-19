@@ -12,6 +12,18 @@ export function App() {
   const [wsConnected, setWsConnected] = useState<boolean>(false);
   const [isTriggerModalOpen, setIsTriggerModalOpen] = useState<boolean>(false);
   const [realtimePoints, setRealtimePoints] = useState<Record<string, SensorDataPoint[]>>({});
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('fixer_theme') as 'light' | 'dark') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('fixer_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const fetchMachines = async () => {
     try {
@@ -94,6 +106,8 @@ export function App() {
           wsConnected={wsConnected}
           onOpenTriggerModal={() => setIsTriggerModalOpen(true)}
           activeTriggerCount={activeTriggerCount}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
 
         <div style={{ flex: 1 }}>

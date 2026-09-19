@@ -84,14 +84,14 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
   if (loading || !machineData) {
     return (
       <main style={{ maxWidth: '1440px', margin: '0 auto', padding: '40px 28px', textAlign: 'center' }}>
-        <p style={{ color: '#94a3b8' }}>Loading diagnostic context for {machineId}...</p>
+        <p style={{ color: 'var(--text-muted)' }}>Loading diagnostic context for {machineId}...</p>
       </main>
     );
   }
 
   const isHealthy = machineData.health_status === 'healthy';
   const isWarning = machineData.health_status === 'warning';
-  const statusColor = isHealthy ? '#10b981' : isWarning ? '#f59e0b' : '#ef4444';
+  const statusColor = isHealthy ? 'var(--status-healthy)' : isWarning ? 'var(--status-warning)' : 'var(--status-critical)';
 
   const sensorStream = realtimePoints[machineId] || [];
 
@@ -109,28 +109,18 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
 
   const sensorBaseline = machineData.baseline_ranges?.[selectedSensor] || {};
   const meanVal = sensorBaseline.mean;
-  const critVal = machineData.rul?.threshold_value;
+  const upperLimit = sensorBaseline.upper_critical || (meanVal ? meanVal * 1.5 : undefined);
 
   return (
-    <main style={{ maxWidth: '1440px', margin: '0 auto', padding: '32px 28px' }}>
-      {/* Navigation Breadcrumb */}
-      <div style={{ marginBottom: '20px' }}>
-        <Link
-          to="/"
-          style={{
-            textDecoration: 'none',
-            color: '#94a3b8',
-            fontSize: '0.85rem',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            transition: 'color 0.2s',
-          }}
-        >
-          <span>←</span>
-          <span>Back to Fleet Overview</span>
+    <main style={{ maxWidth: '1440px', margin: '0 auto', padding: '28px 28px 60px' }}>
+      {/* Breadcrumbs */}
+      <nav style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}>
+        <Link to="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>
+          ← Fleet Overview
         </Link>
-      </div>
+        <span style={{ color: 'var(--text-muted)' }}>/</span>
+        <span style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>{machineData.name} ({machineId})</span>
+      </nav>
 
       {/* Machine Header */}
       <div style={{
@@ -147,24 +137,24 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
               fontFamily: 'var(--font-mono)',
               fontSize: '1rem',
               fontWeight: 800,
-              background: 'rgba(99, 102, 241, 0.2)',
-              color: '#818cf8',
+              background: 'rgba(37, 99, 235, 0.12)',
+              color: 'var(--accent-blue)',
               padding: '4px 12px',
-              borderRadius: '8px',
-              border: '1px solid rgba(99, 102, 241, 0.3)',
+              borderRadius: 'var(--btn-radius)',
+              border: '1px solid rgba(37, 99, 235, 0.25)',
             }}>
               {machineData.machine_id}
             </span>
-            <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
               {machineData.location} • Installed {machineData.install_date}
             </span>
           </div>
 
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em', margin: 0 }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>
             {machineData.name}
           </h1>
-          <p style={{ fontSize: '0.84rem', color: '#64748b', marginTop: '4px', margin: 0 }}>
-            Architecture Model: <strong style={{ color: '#94a3b8' }}>{machineData.model}</strong> • Monitored via isolated Tier 1 & Tier 2 RAG
+          <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginTop: '4px', margin: 0 }}>
+            Architecture Model: <strong style={{ color: 'var(--text-secondary)' }}>{machineData.model}</strong> • Monitored via isolated Tier 1 & Tier 2 RAG
           </p>
         </div>
 
@@ -172,30 +162,21 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
           <button
             onClick={handleExportReport}
             disabled={isExporting}
+            className="btn-secondary"
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '20px',
-              color: '#cbd5e1',
-              padding: '6px 14px',
-              fontSize: '0.8rem',
+              padding: '8px 16px',
+              fontSize: '0.82rem',
               fontWeight: 600,
               cursor: isExporting ? 'wait' : 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.2s',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)')}
           >
             <span>📄</span>
-            <span>{isExporting ? 'Generating Report...' : 'Export Shift Report'}</span>
+            <span>{isExporting ? 'Generating...' : 'Export Shift Report'}</span>
           </button>
 
           <div className={isHealthy ? 'badge-healthy' : isWarning ? 'badge-warning' : 'badge-critical'} style={{
-            padding: '6px 14px',
-            borderRadius: '20px',
+            padding: '8px 14px',
+            borderRadius: 'var(--btn-radius)',
             fontSize: '0.8rem',
             fontWeight: 700,
             textTransform: 'uppercase',
@@ -209,26 +190,26 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
         </div>
       </div>
 
-      {/* Hero Prognostic Row: Health Score, RUL, OEE */}
+      {/* Hero Prognostic Row: Health Score, RUL, OEE, ISO 14224 Reliability */}
       <section style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
         gap: '20px',
         marginBottom: '32px',
       }}>
         {/* Health Score Card */}
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
             Industrial Health Score (ISO 10816)
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginTop: '6px' }}>
             <span style={{ fontSize: '3rem', fontWeight: 800, color: statusColor, lineHeight: 1 }}>
               {machineData.health_score}
             </span>
-            <span style={{ fontSize: '1.1rem', color: '#64748b' }}>/ 100</span>
+            <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>/ 100</span>
           </div>
 
-          <p style={{ fontSize: '0.8rem', color: isHealthy ? '#34d399' : '#fbbf24', marginTop: '8px', margin: 0 }}>
+          <p style={{ fontSize: '0.8rem', color: isHealthy ? 'var(--status-healthy)' : 'var(--status-warning)', marginTop: '8px', margin: 0 }}>
             {machineData.health?.primary_driver
               ? `Primary fault driver: ${machineData.health.primary_driver}`
               : 'All sensor signals within historical operational envelope.'}
@@ -238,87 +219,89 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
         {/* RUL Forecast Card */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
               Remaining Useful Life (RUL)
             </span>
             <span style={{
               fontSize: '0.68rem',
-              color: '#38bdf8',
-              background: 'rgba(6, 182, 212, 0.12)',
-              border: '1px solid rgba(6, 182, 212, 0.25)',
+              color: 'var(--accent-blue)',
+              background: 'rgba(37, 99, 235, 0.12)',
+              border: '1px solid rgba(37, 99, 235, 0.25)',
               padding: '2px 8px',
-              borderRadius: '6px',
+              borderRadius: 'var(--btn-radius)',
+              fontWeight: 600,
             }}>
               Heuristic
             </span>
           </div>
 
-          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#f8fafc', marginTop: '8px' }}>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '8px' }}>
             {machineData.rul?.service_window || '> 30 days (nominal)'}
           </div>
 
-          <p style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '4px', margin: 0 }}>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', margin: 0 }}>
             {machineData.rul?.rul_hours
               ? `Extrapolated: ~${machineData.rul.rul_hours.toFixed(1)}h to critical OEM limit`
               : 'Zero active degradation drift detected'}
           </p>
-          <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '10px', fontStyle: 'italic' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '10px', fontStyle: 'italic' }}>
             ℹ️ {machineData.rul?.heuristic_disclosure || 'Trend-based extrapolation'}
           </div>
         </div>
 
         {/* OEE Card */}
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
             Overall Equipment Effectiveness (OEE)
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '6px' }}>
-            <span style={{ fontSize: '3rem', fontWeight: 800, color: '#38bdf8', lineHeight: 1 }}>
+            <span style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--accent-blue)', lineHeight: 1 }}>
               {machineData.oee_pct}%
             </span>
-            <span style={{ fontSize: '0.82rem', color: '#34d399' }}>Nominal Rating</span>
+            <span style={{ fontSize: '0.82rem', color: 'var(--status-healthy)', fontWeight: 600 }}>Nominal Rating</span>
           </div>
-          <div style={{ display: 'flex', gap: '16px', marginTop: '12px', fontSize: '0.75rem', color: '#94a3b8' }}>
-            <span>Avail: <strong>96%</strong></span>
-            <span>Perf: <strong>98%</strong></span>
-            <span>Qual: <strong>99.4%</strong></span>
+          <div style={{ display: 'flex', gap: '16px', marginTop: '12px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <span>Avail: <strong style={{ color: 'var(--text-secondary)' }}>96%</strong></span>
+            <span>Perf: <strong style={{ color: 'var(--text-secondary)' }}>98%</strong></span>
+            <span>Qual: <strong style={{ color: 'var(--text-secondary)' }}>99.4%</strong></span>
           </div>
         </div>
 
         {/* ISO 14224 Reliability Profile Card */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <span style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
               ISO 14224 Reliability
             </span>
             <span style={{
               fontSize: '0.68rem',
-              color: '#34d399',
-              background: 'rgba(52, 211, 153, 0.12)',
-              border: '1px solid rgba(52, 211, 153, 0.25)',
+              color: 'var(--status-healthy)',
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
               padding: '2px 8px',
-              borderRadius: '6px',
+              borderRadius: 'var(--btn-radius)',
+              fontWeight: 600,
             }}>
               {reliability ? `${reliability.availability_pct}% Avail` : '100% Avail'}
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '8px' }}>
-            <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#f8fafc' }}>
+            <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               {reliability ? `${reliability.mtbf_hours}h` : '720h'}
             </span>
-            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>MTBF</span>
-            <span style={{ fontSize: '0.9rem', color: '#64748b', margin: '0 4px' }}>|</span>
-            <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fbbf24' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>MTBF</span>
+            <span style={{ fontSize: '0.9rem', color: 'var(--border-card)', margin: '0 4px' }}>|</span>
+            <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--status-warning)' }}>
               {reliability ? `${reliability.mttr_hours}h` : '1.0h'}
             </span>
-            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>MTTR</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>MTTR</span>
           </div>
 
-          <p style={{ fontSize: '0.76rem', color: '#34d399', marginTop: '8px', margin: 0 }}>
+          <p style={{ fontSize: '0.76rem', color: 'var(--status-healthy)', marginTop: '8px', margin: 0, fontWeight: 600 }}>
             💰 <strong>${reliability ? reliability.cost_avoided_usd.toLocaleString() : '0'}</strong> downtime cost avoided
           </p>
-          <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '10px' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '10px' }}>
             {reliability ? `${reliability.total_downtime_hours}h downtime (${reliability.failure_count} incidents in ${reliability.window_days}d)` : '90-day operational evaluation window'}
           </div>
         </div>
@@ -333,12 +316,12 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
       }}>
         {/* Left Column: Real-time Recharts Live Telemetry */}
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
             <div>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                 Live Sensor Telemetry
               </h2>
-              <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+              <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
                 WebSocket live streaming • Mean-reverting Ornstein-Uhlenbeck baseline
               </span>
             </div>
@@ -350,14 +333,15 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
                   key={sensorKey}
                   onClick={() => setSelectedSensor(sensorKey)}
                   style={{
-                    background: selectedSensor === sensorKey ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255, 255, 255, 0.05)',
-                    border: `1px solid ${selectedSensor === sensorKey ? '#6366f1' : 'rgba(255, 255, 255, 0.08)'}`,
-                    color: selectedSensor === sensorKey ? '#ffffff' : '#94a3b8',
+                    background: selectedSensor === sensorKey ? 'rgba(37, 99, 235, 0.2)' : 'var(--bg-card-subtle)',
+                    border: `1px solid ${selectedSensor === sensorKey ? 'var(--accent-blue)' : 'var(--border-card)'}`,
+                    color: selectedSensor === sensorKey ? 'var(--accent-blue)' : 'var(--text-muted)',
                     padding: '4px 10px',
-                    borderRadius: '8px',
+                    borderRadius: 'var(--btn-radius)',
                     fontSize: '0.75rem',
                     fontWeight: 600,
                     cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
                 >
                   {sensorKey}
@@ -370,27 +354,38 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
           <div style={{ width: '100%', height: '340px', marginTop: '10px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
-                <XAxis dataKey="time" stroke="#64748b" fontSize={11} />
-                <YAxis stroke="#64748b" fontSize={11} domain={['auto', 'auto']} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
+                <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={11} />
+                <YAxis stroke="var(--text-muted)" fontSize={11} domain={['auto', 'auto']} />
                 <Tooltip
                   contentStyle={{
-                    background: '#0f172a',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    fontSize: '12px',
+                    background: 'var(--bg-card-solid)',
+                    border: '1px solid var(--border-card)',
+                    borderRadius: 'var(--btn-radius)',
+                    color: 'var(--text-primary)',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
                   }}
                 />
-                {meanVal && (
-                  <ReferenceLine y={meanVal} stroke="#06b6d4" strokeDasharray="3 3" label={{ value: 'Baseline Mean', fill: '#06b6d4', fontSize: 10 }} />
+                {meanVal !== undefined && (
+                  <ReferenceLine
+                    y={meanVal}
+                    stroke="var(--status-healthy)"
+                    strokeDasharray="4 4"
+                    label={{ value: 'Baseline', fill: 'var(--status-healthy)', fontSize: 10, position: 'right' }}
+                  />
                 )}
-                {critVal && (
-                  <ReferenceLine y={critVal} stroke="#ef4444" strokeDasharray="3 3" label={{ value: 'Critical Limit', fill: '#ef4444', fontSize: 10 }} />
+                {upperLimit !== undefined && (
+                  <ReferenceLine
+                    y={upperLimit}
+                    stroke="var(--status-critical)"
+                    strokeDasharray="4 4"
+                    label={{ value: 'Limit', fill: 'var(--status-critical)', fontSize: 10, position: 'right' }}
+                  />
                 )}
                 <Line
                   type="monotone"
                   dataKey={selectedSensor}
-                  stroke="#818cf8"
+                  stroke="#2563eb"
                   strokeWidth={2.5}
                   dot={false}
                   isAnimationActive={false}
@@ -404,7 +399,7 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
             marginTop: '20px',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-            gap: '12px',
+            gap: '10px',
           }}>
             {Object.entries(machineData.current_readings).map(([stype, val]) => {
               const det = machineData.health?.sensor_details?.[stype];
@@ -415,23 +410,24 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
                   onClick={() => stype !== 'cycle_count' && setSelectedSensor(stype)}
                   style={{
                     padding: '10px 12px',
-                    borderRadius: '10px',
-                    background: isSelected ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                    border: `1px solid ${isSelected ? '#6366f1' : 'rgba(255, 255, 255, 0.06)'}`,
+                    borderRadius: 'var(--btn-radius)',
+                    background: isSelected ? 'rgba(37, 99, 235, 0.15)' : 'var(--bg-card-subtle)',
+                    border: `1px solid ${isSelected ? 'var(--accent-blue)' : 'var(--border-subtle)'}`,
                     cursor: stype !== 'cycle_count' ? 'pointer' : 'default',
+                    transition: 'all 0.15s ease',
                   }}
                 >
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'capitalize' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
                     {stype}
                   </div>
-                  <div className="telemetry-val" style={{ fontSize: '1.05rem', color: '#f8fafc', marginTop: '2px' }}>
+                  <div className="telemetry-val" style={{ fontSize: '1.05rem', color: 'var(--text-primary)', marginTop: '2px' }}>
                     {typeof val === 'number' ? val.toFixed(2) : val}
-                    <span style={{ fontSize: '0.7rem', color: '#64748b', marginLeft: '4px' }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: '4px' }}>
                       {det?.unit || ''}
                     </span>
                   </div>
                   {det && (
-                    <div style={{ fontSize: '0.68rem', color: det.status === 'healthy' ? '#34d399' : '#f87171', marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.68rem', color: det.status === 'healthy' ? 'var(--status-healthy)' : 'var(--status-critical)', marginTop: '2px', fontWeight: 600 }}>
                       {det.z_score > 0 ? `+${det.z_score.toFixed(1)}σ` : 'Nominal'}
                     </div>
                   )}
@@ -454,10 +450,10 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
       {/* Problem → Cause → Remedy Failure History (ISO 14224) */}
       <section className="glass-panel" style={{ padding: '28px' }}>
         <div style={{ marginBottom: '18px' }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
             Incident History & ISO 14224 CMMS Taxonomy
           </h2>
-          <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>
+          <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
             Problem → Cause → Remedy records embedded into {machineId}'s Tier 2 vector brain
           </span>
         </div>
@@ -465,7 +461,7 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
+              <tr style={{ borderBottom: '1px solid var(--table-border)', color: 'var(--text-muted)' }}>
                 <th style={{ padding: '10px 14px' }}>Ticket ID</th>
                 <th style={{ padding: '10px 14px' }}>Date</th>
                 <th style={{ padding: '10px 14px' }}>Failure Code</th>
@@ -477,23 +473,23 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
             <tbody>
               {machineData.recent_tickets.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
+                  <td colSpan={6} style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>
                     No recorded incident tickets for this machine.
                   </td>
                 </tr>
               ) : (
                 machineData.recent_tickets.map((t) => (
-                  <tr key={t.ticket_id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                    <td style={{ padding: '12px 14px', fontFamily: 'var(--font-mono)', color: '#38bdf8' }}>
+                  <tr key={t.ticket_id} style={{ borderBottom: '1px solid var(--table-border)' }}>
+                    <td style={{ padding: '12px 14px', fontFamily: 'var(--font-mono)', color: 'var(--accent-blue)', fontWeight: 600 }}>
                       {t.ticket_id.slice(0, 8)}
                     </td>
-                    <td style={{ padding: '12px 14px', color: '#94a3b8' }}>
+                    <td style={{ padding: '12px 14px', color: 'var(--text-muted)' }}>
                       {new Date(t.opened_at).toLocaleDateString()}
                     </td>
-                    <td style={{ padding: '12px 14px', fontFamily: 'var(--font-mono)', color: '#a5b4fc' }}>
+                    <td style={{ padding: '12px 14px', fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
                       {t.failure_code || '—'}
                     </td>
-                    <td style={{ padding: '12px 14px', color: '#f1f5f9', maxWidth: '300px' }}>
+                    <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', maxWidth: '300px' }}>
                       {t.symptom_text}
                     </td>
                     <td style={{ padding: '12px 14px' }}>
@@ -501,7 +497,7 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
                         textTransform: 'uppercase',
                         fontSize: '0.7rem',
                         fontWeight: 700,
-                        color: t.severity === 'critical' ? '#f87171' : t.severity === 'high' ? '#fb923c' : '#fbbf24',
+                        color: t.severity === 'critical' ? 'var(--status-critical)' : t.severity === 'high' ? 'var(--status-warning)' : 'var(--accent-blue)',
                       }}>
                         {t.severity}
                       </span>
@@ -509,10 +505,10 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
                     <td style={{ padding: '12px 14px' }}>
                       <span style={{
                         fontSize: '0.72rem',
-                        padding: '2px 8px',
-                        borderRadius: '6px',
+                        padding: '3px 8px',
+                        borderRadius: 'var(--btn-radius)',
                         background: t.status === 'resolved' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-                        color: t.status === 'resolved' ? '#34d399' : '#f87171',
+                        color: t.status === 'resolved' ? 'var(--status-healthy)' : 'var(--status-critical)',
                         border: `1px solid ${t.status === 'resolved' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
                       }}>
                         {t.status}

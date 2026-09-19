@@ -99,7 +99,7 @@ export const TriggerModal: FC<TriggerModalProps> = ({
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(3, 7, 18, 0.82)',
+      background: 'rgba(3, 7, 18, 0.75)',
       backdropFilter: 'blur(10px)',
       display: 'flex',
       alignItems: 'center',
@@ -108,28 +108,28 @@ export const TriggerModal: FC<TriggerModalProps> = ({
       padding: '20px',
     }}>
       <div style={{
-        background: '#0d1322',
-        border: '1px solid rgba(255, 255, 255, 0.14)',
-        borderRadius: '20px',
+        background: 'var(--bg-card-solid)',
+        border: '1px solid var(--border-card)',
+        borderRadius: 'var(--card-radius)',
         width: '100%',
         maxWidth: '680px',
-        boxShadow: '0 24px 64px rgba(0, 0, 0, 0.6)',
+        boxShadow: '0 24px 64px rgba(0, 0, 0, 0.35)',
         overflow: 'hidden',
       }}>
         {/* Modal Header */}
         <div style={{
-          padding: '22px 28px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          padding: '20px 24px',
+          borderBottom: '1px solid var(--border-card)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'rgba(255, 255, 255, 0.02)',
+          background: 'var(--bg-card-subtle)',
         }}>
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
               <span>⚡</span> Hidden Anomaly Injection Panel
             </h2>
-            <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0, marginTop: '2px' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0, marginTop: '2px' }}>
               Gradual physical fault escalation presets for live demo validation
             </p>
           </div>
@@ -138,7 +138,7 @@ export const TriggerModal: FC<TriggerModalProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#94a3b8',
+              color: 'var(--text-muted)',
               fontSize: '1.4rem',
               cursor: 'pointer',
               lineHeight: 1,
@@ -150,7 +150,7 @@ export const TriggerModal: FC<TriggerModalProps> = ({
         </div>
 
         {/* Presets List */}
-        <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {triggerPresets.map((preset) => {
             const isActive = !!activeTriggers[preset.machine_id];
             const triggerInfo = activeTriggers[preset.machine_id];
@@ -159,10 +159,10 @@ export const TriggerModal: FC<TriggerModalProps> = ({
               <div
                 key={preset.machine_id}
                 style={{
-                  padding: '18px 20px',
-                  borderRadius: '14px',
-                  background: isActive ? 'rgba(239, 68, 68, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-                  border: `1px solid ${isActive ? 'rgba(239, 68, 68, 0.35)' : 'rgba(255, 255, 255, 0.08)'}`,
+                  padding: '16px 20px',
+                  borderRadius: 'var(--btn-radius)',
+                  background: isActive ? 'rgba(239, 68, 68, 0.08)' : 'var(--bg-card-subtle)',
+                  border: `1px solid ${isActive ? 'rgba(239, 68, 68, 0.35)' : 'var(--border-card)'}`,
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -174,22 +174,23 @@ export const TriggerModal: FC<TriggerModalProps> = ({
                     <span style={{
                       fontWeight: 700,
                       fontSize: '0.78rem',
-                      background: 'rgba(99, 102, 241, 0.2)',
-                      color: '#a5b4fc',
+                      background: 'rgba(37, 99, 235, 0.12)',
+                      color: 'var(--accent-blue)',
                       padding: '2px 8px',
-                      borderRadius: '6px',
+                      borderRadius: 'var(--btn-radius)',
+                      border: '1px solid rgba(37, 99, 235, 0.25)',
                     }}>
                       {preset.machine_id}
                     </span>
-                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#f8fafc', margin: 0 }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
                       {preset.title}
                     </h3>
                   </div>
-                  <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
                     {preset.desc}
                   </p>
                   {isActive && (
-                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: '#f87171' }}>
+                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: 'var(--status-critical)' }}>
                       <span className="pulse-dot" style={{ background: '#ef4444' }} />
                       <span>Fault Active & Escalating (Simulation Tick: {triggerInfo?.t_since_trigger ? Math.round(triggerInfo.t_since_trigger) : 0})</span>
                     </div>
@@ -202,7 +203,7 @@ export const TriggerModal: FC<TriggerModalProps> = ({
                       className="btn-secondary"
                       onClick={() => handleDeactivate(preset.machine_id)}
                       disabled={loadingMachine === preset.machine_id}
-                      style={{ padding: '8px 14px', fontSize: '0.8rem', color: '#38bdf8' }}
+                      style={{ padding: '8px 14px', fontSize: '0.8rem', color: 'var(--accent-blue)' }}
                     >
                       {loadingMachine === preset.machine_id ? 'Resetting...' : 'Reset to Normal'}
                     </button>
@@ -224,14 +225,14 @@ export const TriggerModal: FC<TriggerModalProps> = ({
 
         {/* Modal Footer */}
         <div style={{
-          padding: '16px 28px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'rgba(255, 255, 255, 0.01)',
+          padding: '16px 24px',
+          borderTop: '1px solid var(--border-card)',
+          background: 'var(--bg-card-subtle)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             ℹ️ Failure curves develop gradually (OU drift compresses weeks into demo minutes).
           </span>
           <button className="btn-secondary" onClick={onClose} style={{ padding: '8px 18px', fontSize: '0.82rem' }}>

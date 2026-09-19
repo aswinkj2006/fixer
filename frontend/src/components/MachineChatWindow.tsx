@@ -128,7 +128,6 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
       }, 1000);
     } catch (err) {
       console.warn('Microphone access unavailable or denied:', err);
-      // Seamless fallback to simulated audio
       setUseSimulatedAudio(true);
     }
   };
@@ -303,8 +302,8 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
       {/* Chat Header */}
       <div style={{
         padding: '16px 20px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        background: 'rgba(0, 0, 0, 0.25)',
+        borderBottom: '1px solid var(--border-card)',
+        background: 'var(--bg-card-subtle)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -313,20 +312,21 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
           <div style={{
             width: '28px',
             height: '28px',
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+            borderRadius: 'var(--btn-radius)',
+            background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '0.85rem',
+            color: '#ffffff',
           }}>
             🤖
           </div>
           <div>
-            <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+            <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
               Multimodal Advisory Assistant
             </h3>
-            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
               Scoped to {machineId} • Isolated Tier 2 Memory
             </span>
           </div>
@@ -334,11 +334,11 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
 
         <span style={{
           fontSize: '0.7rem',
-          color: '#34d399',
+          color: 'var(--status-healthy)',
           background: 'rgba(16, 185, 129, 0.1)',
           border: '1px solid rgba(16, 185, 129, 0.25)',
           padding: '3px 9px',
-          borderRadius: '12px',
+          borderRadius: 'var(--btn-radius)',
           fontWeight: 600,
         }}>
           ● Tier 1/2 Active ({recentTickets.length} past records)
@@ -370,24 +370,24 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
             >
               <div style={{
                 fontSize: '0.72rem',
-                color: '#64748b',
+                color: 'var(--text-muted)',
                 alignSelf: isUser ? 'flex-end' : 'flex-start',
                 display: 'flex',
                 gap: '8px',
               }}>
-                <span style={{ fontWeight: 600, color: isUser ? '#38bdf8' : '#a78bfa' }}>{m.senderName}</span>
+                <span style={{ fontWeight: 600, color: isUser ? 'var(--accent-blue)' : 'var(--accent-violet)' }}>{m.senderName}</span>
                 <span>{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
               </div>
 
               <div style={{
-                background: isUser ? 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)' : 'rgba(15, 23, 42, 0.9)',
-                border: `1px solid ${isUser ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
-                borderRadius: '14px',
+                background: isUser ? 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)' : 'var(--chat-bubble-bot)',
+                border: `1px solid ${isUser ? 'rgba(37, 99, 235, 0.4)' : 'var(--chat-bubble-bot-border)'}`,
+                borderRadius: 'var(--btn-radius)',
                 padding: '14px 18px',
-                color: '#f8fafc',
+                color: isUser ? '#ffffff' : 'var(--text-primary)',
                 fontSize: '0.86rem',
                 lineHeight: 1.5,
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
               }}>
                 {/* Media Attachment Badges in Message */}
                 {(m.hasAudio || m.hasImage) && (
@@ -395,10 +395,10 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                     {m.hasAudio && (
                       <span style={{
                         fontSize: '0.7rem',
-                        background: 'rgba(52, 211, 153, 0.2)',
-                        color: '#34d399',
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        color: 'var(--status-healthy)',
                         padding: '2px 8px',
-                        borderRadius: '12px',
+                        borderRadius: 'var(--btn-radius)',
                         fontWeight: 600,
                       }}>
                         🎙️ Voice Note Included
@@ -407,10 +407,10 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                     {m.hasImage && (
                       <span style={{
                         fontSize: '0.7rem',
-                        background: 'rgba(56, 189, 248, 0.2)',
-                        color: '#38bdf8',
+                        background: 'rgba(37, 99, 235, 0.15)',
+                        color: 'var(--accent-blue)',
                         padding: '2px 8px',
-                        borderRadius: '12px',
+                        borderRadius: 'var(--btn-radius)',
                         fontWeight: 600,
                       }}>
                         📷 Defect Photo Attached
@@ -421,7 +421,7 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
 
                 {/* Optional Image Preview inside Message */}
                 {m.imagePreviewUrl && (
-                  <div style={{ marginBottom: '10px', borderRadius: '8px', overflow: 'hidden', maxWidth: '240px' }}>
+                  <div style={{ marginBottom: '10px', borderRadius: 'var(--btn-radius)', overflow: 'hidden', maxWidth: '240px', border: '1px solid var(--border-card)' }}>
                     <img src={m.imagePreviewUrl} alt="Defect" style={{ width: '100%', height: 'auto', display: 'block' }} />
                   </div>
                 )}
@@ -433,9 +433,9 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                   <div style={{
                     marginTop: '14px',
                     padding: '14px',
-                    borderRadius: '12px',
-                    background: 'rgba(0, 0, 0, 0.35)',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderRadius: 'var(--btn-radius)',
+                    background: 'var(--bg-card-subtle)',
+                    border: '1px solid var(--border-card)',
                   }}>
                     {/* Severity & Confidence */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
@@ -444,25 +444,25 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                         fontWeight: 700,
                         fontSize: '0.74rem',
                         padding: '2px 8px',
-                        borderRadius: '6px',
-                        background: m.diagnosis.severity === 'critical' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                        color: m.diagnosis.severity === 'critical' ? '#f87171' : '#fbbf24',
+                        borderRadius: 'var(--btn-radius)',
+                        background: m.diagnosis.severity === 'critical' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                        color: m.diagnosis.severity === 'critical' ? 'var(--status-critical)' : 'var(--status-warning)',
                         border: `1px solid ${m.diagnosis.severity === 'critical' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
                       }}>
                         Severity: {m.diagnosis.severity}
                       </span>
-                      <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                        Confidence: <strong style={{ color: '#38bdf8' }}>{Math.round((m.diagnosis.confidence || 0.8) * 100)}%</strong>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                        Confidence: <strong style={{ color: 'var(--accent-blue)' }}>{Math.round((m.diagnosis.confidence || 0.8) * 100)}%</strong>
                       </span>
                     </div>
 
                     {/* Top Diagnosis */}
                     {m.diagnosis.ranked_diagnoses && m.diagnosis.ranked_diagnoses[0] && (
                       <div style={{ marginBottom: '10px' }}>
-                        <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.88rem' }}>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.88rem' }}>
                           {m.diagnosis.ranked_diagnoses[0].diagnosis}
                         </div>
-                        <div style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic', marginTop: '2px' }}>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '2px' }}>
                           Evidence: {m.diagnosis.ranked_diagnoses[0].evidence}
                         </div>
                       </div>
@@ -471,10 +471,10 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                     {/* Repair Steps */}
                     {m.diagnosis.repair_steps && (
                       <div style={{ marginTop: '10px' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', textTransform: 'uppercase', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-blue)', textTransform: 'uppercase', marginBottom: '4px' }}>
                           Synthesized Repair Checklist (OEM Manual):
                         </div>
-                        <ul style={{ paddingLeft: '18px', margin: 0, fontSize: '0.78rem', color: '#cbd5e1' }}>
+                        <ul style={{ paddingLeft: '18px', margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
                           {m.diagnosis.repair_steps.map((step: string, idx: number) => (
                             <li key={idx} style={{ marginBottom: '3px' }}>{step}</li>
                           ))}
@@ -487,11 +487,11 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                       <div style={{
                         marginTop: '12px',
                         padding: '8px 12px',
-                        borderRadius: '8px',
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        border: '1px solid rgba(99, 102, 241, 0.25)',
+                        borderRadius: 'var(--btn-radius)',
+                        background: 'rgba(37, 99, 235, 0.1)',
+                        border: '1px solid rgba(37, 99, 235, 0.25)',
                         fontSize: '0.78rem',
-                        color: '#c7d2fe',
+                        color: 'var(--accent-blue)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -505,7 +505,7 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                     {m.ticketId && (
                       <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'flex-end' }}>
                         {resolvedTickets[m.ticketId] ? (
-                          <span style={{ fontSize: '0.78rem', color: '#34d399', fontWeight: 600 }}>
+                          <span style={{ fontSize: '0.78rem', color: 'var(--status-healthy)', fontWeight: 600 }}>
                             ✓ Resolved & Embedded into Tier 2
                           </span>
                         ) : (
@@ -533,8 +533,8 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
         onSubmit={handleSend}
         style={{
           padding: '16px 20px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'rgba(7, 10, 19, 0.95)',
+          borderTop: '1px solid var(--border-card)',
+          background: 'var(--bg-card-subtle)',
           display: 'flex',
           flexDirection: 'column',
           gap: '10px',
@@ -547,15 +547,15 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
             alignItems: 'center',
             gap: '10px',
             padding: '8px 12px',
-            borderRadius: '8px',
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: 'var(--btn-radius)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-card)',
             fontSize: '0.75rem',
             flexWrap: 'wrap',
           }}>
             {/* Audio Attachment Preview */}
             {(recordedAudioBlob || useSimulatedAudio) && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#34d399' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--status-healthy)' }}>
                 <span>🎵</span>
                 <span>{recordedAudioBlob ? `Voice Note (${recordingDuration || '1'}s)` : 'Simulated Voice Note'}</span>
                 {recordedAudioUrl && (
@@ -564,7 +564,7 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                 <button
                   type="button"
                   onClick={clearAudio}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0 4px' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0 4px' }}
                 >
                   ✕
                 </button>
@@ -573,7 +573,7 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
 
             {/* Image Attachment Preview */}
             {(selectedImageUrl || useSimulatedImage) && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-blue)' }}>
                 {selectedImageUrl ? (
                   <img
                     src={selectedImageUrl}
@@ -587,7 +587,7 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                 <button
                   type="button"
                   onClick={clearImage}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0 4px' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0 4px' }}
                 >
                   ✕
                 </button>
@@ -605,11 +605,11 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                 type="button"
                 onClick={stopRecording}
                 style={{
-                  background: 'rgba(239, 68, 68, 0.25)',
-                  border: '1px solid #ef4444',
-                  color: '#f87171',
-                  padding: '5px 12px',
-                  borderRadius: '8px',
+                  background: 'rgba(239, 68, 68, 0.15)',
+                  border: '1px solid var(--status-critical)',
+                  color: 'var(--status-critical)',
+                  padding: '6px 12px',
+                  borderRadius: 'var(--btn-radius)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -619,23 +619,14 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
                 }}
               >
                 <span>⏹️</span>
-                <span>Stop Recording ({recordingDuration}s)</span>
+                <span>Stop ({recordingDuration}s)</span>
               </button>
             ) : (
               <button
                 type="button"
                 onClick={startRecording}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  color: '#94a3b8',
-                  padding: '5px 12px',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
+                className="btn-secondary"
+                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
               >
                 <span>🎙️</span>
                 <span>Record Voice</span>
@@ -653,17 +644,8 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: '#94a3b8',
-                padding: '5px 12px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
+              className="btn-secondary"
+              style={{ padding: '6px 12px', fontSize: '0.78rem' }}
             >
               <span>📷</span>
               <span>Upload Photo</span>
@@ -672,20 +654,22 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
 
           {/* Quick-Select Defect Samples */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Defect Samples:</span>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Defect Samples:</span>
             {DEFECT_PRESETS.map((p) => (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => selectPreset(p)}
                 style={{
-                  background: selectedImageName === p.title ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                  border: selectedImageName === p.title ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
-                  color: selectedImageName === p.title ? '#38bdf8' : '#94a3b8',
+                  background: selectedImageName === p.title ? 'rgba(37, 99, 235, 0.18)' : 'var(--bg-card-subtle)',
+                  border: selectedImageName === p.title ? '1px solid var(--accent-blue)' : '1px solid var(--border-card)',
+                  color: selectedImageName === p.title ? 'var(--accent-blue)' : 'var(--text-muted)',
                   padding: '3px 8px',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--btn-radius)',
                   cursor: 'pointer',
                   fontSize: '0.72rem',
+                  fontWeight: 600,
+                  transition: 'all 0.15s ease',
                 }}
               >
                 {p.machineId} Defect
@@ -704,13 +688,14 @@ export const MachineChatWindow: FC<MachineChatWindowProps> = ({
             placeholder="Type observed symptoms, attach photo, or click Record Voice..."
             style={{
               flex: 1,
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '10px',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--input-border)',
+              borderRadius: 'var(--btn-radius)',
               padding: '10px 14px',
-              color: '#f8fafc',
+              color: 'var(--text-primary)',
               fontSize: '0.85rem',
               outline: 'none',
+              boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
             }}
           />
 
