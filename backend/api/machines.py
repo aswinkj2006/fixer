@@ -188,3 +188,110 @@ async def get_fleet_recurring_faults():
         "count": len(leaderboard),
         "leaderboard": leaderboard,
     }
+
+
+@router.get("/machines/{machine_id}/report")
+async def get_machine_report(machine_id: str):
+    """
+    Generate a formal ISO 14224 / AS9100 Plant Maintenance Diagnostic & Shift Handover Report.
+    Returns both structured JSON metrics and formatted printable text.
+    """
+    from datetime import datetime, timezone
+    from backend.main import AsyncSessionLocal
+    async with AsyncSessionLocal() as db:
+        machine = await db.get(Machine, machine_id)
+        if not machine:
+            raise HTTPException(status_code=404, detail=f"Machine {machine_id} not found")
+
+        readings = get_current_readings(machine_id)
+        baseline_ranges = json.loads(machine.baseline_ranges) if machine.baseline_ranges else DEFAULT_BASELINES.get(machine_id, {})
+        health_report = compute_health_score(machine_id, readings, baseline_ranges=baseline_ranges)
+        rul_report = await estimate_rul_from_db(machine_id, db=db, current_snapshot=readings)
+        clusters = detect_recurring_faults(machine_id)
+
+        result = await db.execute(
+            select(Ticket)
+            .where(Ticket.machine_id == machine_id)
+            .order_by(Ticket.opened_at.desc())
+            .limit(5)
+        )
+        recent_tickets = result.scalars().all()
+
+        now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+        # Build formatted report
+        lines = [
+            "=" * 80,
+            "FIXER.AI — INDUSTRIAL EQUIPMENT DIAGNOSTIC & SHIFT HANDOVER REPORT",
+            "=" * 80,
+            f"Asset ID        : {machine.machine_id}",
+            f"Asset Name      : {machine.name}",
+            f"Model / Class   : {machine.model} ({machine.machine_type})",
+            f"Shop Location   : {machine.location}",
+            f"Installed Date  : {machine.install_date}",
+            f"Report Timestamp: {now_str}",
+            "-" * 80,
+            "1. CONDITION MONITORING & HEALTH STATUS (ISO 10816)",
+            f"   Current Health Score : {round(health_report.health_score, 1)}% [{health_report.status.upper()}]",
+            f"   Primary Fault Driver : {health_report.primary_driver or 'None (All signals within nominal envelope)'}",
+            "   Active Sensor Breakdown:",
+        ]
+
+        for s_key, s_detail in health_report.sensor_details.items():
+            lines.append(
+                f"     • {s_key:<16}: {s_detail.current_value:>7.2f} {s_detail.unit:<5} "
+                f"(Baseline: {s_detail.baseline_mean:>7.2f}, Z: {s_detail.z_score:>+5.2f}, Health: {s_detail.sensor_health_score:>5.1f}%)"
+            )
+
+        lines.extend([
+            "-" * 80,
+            "2. PROGNOSTIC REMAINING USEFUL LIFE (RUL)",
+            f"   Predicted Window     : {rul_report.service_window}",
+            f"   Hours Remaining      : {f'{rul_report.rul_hours:.1f} hrs' if rul_report.rul_hours else 'Nominal (> 720 hrs)'}",
+            f"   Critical Driver      : {rul_report.critical_sensor or 'None'}",
+            f"   Methodology Notice   : {rul_report.heuristic_disclosure}",
+            "-" * 80,
+            "3. TIER 2 ISOLATED VECTOR MEMORY & RECURRING FAULT CLUSTERS",
+            f"   Detected Patterns    : {len(clusters)} recurring historical failure modes",
+        ])
+
+        if clusters:
+            for idx, c in enumerate(clusters, 1):
+                lines.append(f"   [{idx}] {c.pattern_name} ({c.occurrence_count} occurrences, Severity: {c.severity.upper()})")
+                lines.append(f"       Diagnostic Insight   : {c.summary_insight}")
+                lines.append(f"       Longest-Lasting Fix  : {c.longest_lasting_fix}")
+        else:
+            lines.append("   (No recurring failure clusters exceeding threshold in Tier 2 memory)")
+
+        lines.extend([
+            "-" * 80,
+            "4. RECENT CMMS WORK ORDER LOG (ISO 14224)",
+        ])
+
+        if recent_tickets:
+            for t in recent_tickets:
+                lines.append(
+                    f"   • Ticket #{t.ticket_id[:8]} | {t.opened_at[:10]} | Status: {t.status.upper():<9} | "
+                    f"Severity: {t.severity.upper():<8} | {t.symptom_text[:50]}..."
+                )
+        else:
+            lines.append("   (No maintenance tickets logged for this unit)")
+
+        lines.extend([
+            "=" * 80,
+            "OPERATOR SIGN-OFF:",
+            "Lead Technician: ________________________   Date: ______________",
+            "=" * 80,
+        ])
+
+        formatted_text = "\n".join(lines)
+
+        return {
+            "machine_id": machine.machine_id,
+            "timestamp": now_str,
+            "health_score": round(health_report.health_score, 1),
+            "status": health_report.status,
+            "rul_window": rul_report.service_window,
+            "cluster_count": len(clusters),
+            "formatted_report": formatted_text,
+        }

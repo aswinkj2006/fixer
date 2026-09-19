@@ -27,6 +27,29 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
   const [machineData, setMachineData] = useState<MachineDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedSensor, setSelectedSensor] = useState<string>('');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportReport = async () => {
+    if (!machineId) return;
+    setIsExporting(true);
+    try {
+      const res = await axios.get(`/api/machines/${machineId}/report`);
+      const reportText = res.data.formatted_report;
+      const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fixer_ai_${machineId}_diagnostic_report.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Failed to export diagnostic report:', e);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const fetchMachine = async () => {
     try {
@@ -135,6 +158,30 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            onClick={handleExportReport}
+            disabled={isExporting}
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '20px',
+              color: '#cbd5e1',
+              padding: '6px 14px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: isExporting ? 'wait' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)')}
+          >
+            <span>📄</span>
+            <span>{isExporting ? 'Generating Report...' : 'Export Shift Report'}</span>
+          </button>
+
           <div className={isHealthy ? 'badge-healthy' : isWarning ? 'badge-warning' : 'badge-critical'} style={{
             padding: '6px 14px',
             borderRadius: '20px',
