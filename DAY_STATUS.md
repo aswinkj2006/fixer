@@ -264,15 +264,22 @@ The fusion stub includes **real Chroma retrieval** — even in stub mode, the RA
   - Quick-select industrial defect sample gallery with high-res macro photos for M-01 (Grease leak), M-02 (Spindle chatter), and M-03 (Motor overheat) with auto-populating symptom text.
 - `frontend/public/defects/` — Seeded 3 photorealistic industrial defect images: `m01_gearbox_leak.jpg`, `m02_spindle_chatter.jpg`, `m03_motor_overheat.jpg`.
 
+- `frontend/src/index.css`, `App.tsx`, `Navbar.tsx`, `Dashboard.tsx`, `MachineCard.tsx`, `MachineDetail.tsx`, `MachineChatWindow.tsx`, `TriggerModal.tsx`:
+  - **Light / Dark Mode Toggle**: `#btn-theme-toggle` in the navbar with persistent `localStorage` (`fixer_theme`).
+  - **Slightly Rounded Rectangular Buttons Everywhere**: Converted all action buttons, modal buttons, filter selectors, tags, and status badges to `--btn-radius: 6px` and `--card-radius: 8px` (precision SCADA/MES corporate aesthetic).
+  - **Corporate Checkered Drafting Grid**: Dual orthogonal linear gradients (`32px x 32px` grid) creating an architectural blueprint texture in both dark and light modes.
+  - **Adaptive Recharts**: High-contrast grid strokes and theme-aware tooltips.
+
 ### Tested & Verified
-- **Full Backend Suite**: `py -3.11 -m pytest backend/tests/ -v` **73/73 PASSED (100%)** in 29.25s.
+- **Full Backend Suite**: `py -3.11 -m pytest backend/tests/ -v` **73/73 PASSED (100%)** in 33.02s.
   - `test_reliability.py`: 5/5 PASSED.
-- **Frontend Production Build**: `npm run build` in `frontend/` passed in 310ms (0 TypeScript / lint errors).
-- **Live Browser Session**: Verified with browser subagent at `http://localhost:5173/` and `http://localhost:5173/machine/M-01`. Captured screenshots and WebP video recording (`day7_ui_verify_1789809712908.webp`).
+- **Frontend Production Build**: `npm run build` in `frontend/` passed in 394ms (0 TypeScript / lint errors).
+- **Live Browser Session**: Verified with browser subagent at `http://localhost:5173/` and `http://localhost:5173/machine/M-01`. Captured screenshots in both Dark Mode (`dashboard_dark_mode_1789812493404.png`) and Light Mode (`dashboard_light_mode_1789812543764.png`, `machine_detail_top_light_mode_1789812616853.png`).
 - **End-to-End Multimodal Diagnosis**: Tested M-01 Defect sample upload via chat; observed 87% confidence diagnosis with 4 OEM manual citations, LOTO checklist, and automated Slack escalation.
 
 ---
 
 ## 🏆 Project Completion Status (Days 1–7)
-The project is 100% complete through Day 7 with 73/73 passing tests, full multimodal audio/image support, ISO 14224 reliability analytics, and full handover/migration portability.
+The project is 100% complete through Day 7 with 73/73 passing tests, full multimodal audio/image support, ISO 14224 reliability analytics, corporate Light/Dark theming, checkered drafting grid background, slightly rounded rectangular buttons, and full handover/migration portability.
+
 
