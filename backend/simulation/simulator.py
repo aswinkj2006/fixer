@@ -26,7 +26,7 @@ from backend.simulation.ou_process import (
 )
 from backend.simulation.failure_triggers import (
     active_triggers, get_trigger_state,
-    Mode1TorqueDrift, Mode2BearingWear, Mode3MotorFault, TRIGGER_CLASSES
+    Mode1TorqueDrift, Mode2BearingWear, Mode3MotorFault, Mode4CalibrationDrift, TRIGGER_CLASSES
 )
 
 
@@ -46,6 +46,11 @@ class MachineSimulator:
         self.current_values: dict[str, float] = {
             sc.sensor_type: sc.baseline for sc in config.sensors
         }
+
+    def reset_to_baseline(self):
+        """Instantly reset all current sensor values to nominal baseline upon repair."""
+        for sc in self.config.sensors:
+            self.current_values[sc.sensor_type] = sc.baseline
 
     def tick(self, dt_real: float = 1.0) -> dict[str, float]:
         """
@@ -114,6 +119,8 @@ class MachineSimulator:
                 sigma = Mode2BearingWear.modified_sigma(sc.sigma, t)
             elif trigger_class is Mode3MotorFault and sc.sensor_type == "current":
                 baseline = sc.baseline + Mode3MotorFault.current_delta(t)
+            elif trigger_class is Mode4CalibrationDrift and sc.sensor_type == "calibration_dev":
+                baseline = Mode4CalibrationDrift.modified_baseline(sc.baseline, t)
             # Mode 3 vibration spike probability modification is handled below
 
         # ── Generate value using appropriate generator ──
@@ -240,3 +247,15 @@ def get_current_readings(machine_id: str) -> dict[str, float]:
     if sim is None:
         return {}
     return {k: round(float(v), 4) for k, v in sim.current_values.items()}
+
+
+def reset_machine_simulator(machine_id: str) -> dict[str, float]:
+    """Deactivate trigger and reset sensor simulator to baseline for machine_id."""
+    from backend.simulation.failure_triggers import deactivate_trigger
+    deactivate_trigger(machine_id)
+    sim = _simulators.get(machine_id)
+    if sim:
+        sim.reset_to_baseline()
+        return {k: round(float(v), 4) for k, v in sim.current_values.items()}
+    return {}
+

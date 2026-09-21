@@ -4,6 +4,7 @@ import axios from 'axios';
 import type { Machine, FleetLeaderboardItem, FleetReliability } from '../types';
 import { MachineCard } from '../components/MachineCard';
 import { TriggerModal } from '../components/TriggerModal';
+import { FactoryFloor3DViewer } from '../components/FactoryFloor3DViewer';
 
 interface DashboardProps {
   machines: Machine[];
@@ -18,6 +19,7 @@ export const Dashboard: FC<DashboardProps> = ({
   isModalOpen,
   onCloseModal,
 }) => {
+  const [viewMode, setViewMode] = useState<'cards' | 'floor3d'>('cards');
   const [leaderboard, setLeaderboard] = useState<FleetLeaderboardItem[]>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false);
   const [reliability, setReliability] = useState<FleetReliability | null>(null);
@@ -155,33 +157,85 @@ export const Dashboard: FC<DashboardProps> = ({
         </div>
       </section>
 
-      {/* Fleet Machinery Grid Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      {/* Fleet Machinery Header & View Switcher */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '14px' }}>
         <div>
           <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-            Fleet Condition & Telemetry Grid
+            Fleet Machinery & Digital Twins
           </h2>
           <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
-            Real-time multi-sensor prognostic scoring per machine instance
+            Real-time multi-sensor prognostic scoring and 3D digital twin visualization per machine instance
           </p>
         </div>
 
-        <button className="btn-secondary" onClick={onRefresh} style={{ padding: '8px 16px', fontSize: '0.82rem' }}>
-          ↻ Refresh Fleet
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* View Mode Switcher */}
+          <div
+            style={{
+              display: 'flex',
+              background: 'var(--bg-card-subtle)',
+              borderRadius: 'var(--btn-radius)',
+              padding: '3px',
+              border: '1px solid var(--border-card)',
+            }}
+          >
+            <button
+              onClick={() => setViewMode('cards')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '4px',
+                border: 'none',
+                background: viewMode === 'cards' ? 'var(--accent-blue)' : 'transparent',
+                color: viewMode === 'cards' ? '#ffffff' : 'var(--text-muted)',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              📊 Telemetry Grid
+            </button>
+            <button
+              onClick={() => setViewMode('floor3d')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '4px',
+                border: 'none',
+                background: viewMode === 'floor3d' ? 'var(--accent-blue)' : 'transparent',
+                color: viewMode === 'floor3d' ? '#ffffff' : 'var(--text-muted)',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              🏭 3D Factory Floor
+            </button>
+          </div>
+
+          <button className="btn-secondary" onClick={onRefresh} style={{ padding: '8px 16px', fontSize: '0.82rem' }}>
+            ↻ Refresh Fleet
+          </button>
+        </div>
       </div>
 
-      {/* 4-Machine Grid */}
-      <section style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
-        gap: '24px',
-        marginBottom: '48px',
-      }}>
-        {machines.map((machine) => (
-          <MachineCard key={machine.machine_id} machine={machine} />
-        ))}
-      </section>
+      {/* Machinery Content: Either 3D Factory Floor or Card Grid */}
+      {viewMode === 'floor3d' ? (
+        <section style={{ marginBottom: '48px' }}>
+          <FactoryFloor3DViewer machines={machines} height="520px" />
+        </section>
+      ) : (
+        <section style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+          gap: '24px',
+          marginBottom: '48px',
+        }}>
+          {machines.map((machine) => (
+            <MachineCard key={machine.machine_id} machine={machine} />
+          ))}
+        </section>
+      )}
 
       {/* ISO 14224 Fleet Reliability & Financial Impact */}
       <section className="glass-panel" style={{ padding: '28px', marginBottom: '40px' }}>

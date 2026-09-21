@@ -15,6 +15,8 @@ import {
 
 import type { MachineDetailData, SensorDataPoint, MachineReliability } from '../types';
 import { MachineChatWindow } from '../components/MachineChatWindow';
+import { Machine3DViewer } from '../components/Machine3DViewer';
+import { PhysicalWorkbench } from '../components/PhysicalWorkbench';
 
 interface MachineDetailProps {
   realtimePoints: Record<string, SensorDataPoint[]>;
@@ -29,6 +31,8 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
   const [loading, setLoading] = useState(true);
   const [selectedSensor, setSelectedSensor] = useState<string>('');
   const [isExporting, setIsExporting] = useState(false);
+  const [isFaultActive, setIsFaultActive] = useState(false);
+  const [isRepairing, setIsRepairing] = useState(false);
 
   const handleExportReport = async () => {
     if (!machineId) return;
@@ -61,6 +65,9 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
 
       if (resMachine.status === 'fulfilled') {
         setMachineData(resMachine.value.data);
+        if (resMachine.value.data.trigger_active !== undefined) {
+          setIsFaultActive(resMachine.value.data.trigger_active);
+        }
         if (!selectedSensor && resMachine.value.data.current_readings) {
           const first = Object.keys(resMachine.value.data.current_readings).find((k) => k !== 'cycle_count') || Object.keys(resMachine.value.data.current_readings)[0];
           setSelectedSensor(first || '');
@@ -189,6 +196,43 @@ export const MachineDetail: FC<MachineDetailProps> = ({ realtimePoints }) => {
           </div>
         </div>
       </div>
+
+      {/* 3D Digital Twin & Physical Equipment Workbench */}
+      <section style={{ marginBottom: '32px' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gap: '24px',
+          alignItems: 'stretch',
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <Machine3DViewer
+              machineId={machineId}
+              readings={machineData.current_readings}
+              isFaultActive={isFaultActive || machineData.trigger_active}
+              isRepairing={isRepairing}
+              height="480px"
+              showHUD={true}
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <PhysicalWorkbench
+              machineId={machineId}
+              isFaultActive={isFaultActive || machineData.trigger_active}
+              onFaultToggled={(active) => {
+                setIsFaultActive(active);
+                fetchMachine();
+              }}
+              onRepairStart={() => setIsRepairing(true)}
+              onRepairComplete={() => {
+                setIsRepairing(false);
+                setIsFaultActive(false);
+                fetchMachine();
+              }}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Hero Prognostic Row: Health Score, RUL, OEE, ISO 14224 Reliability */}
       <section style={{

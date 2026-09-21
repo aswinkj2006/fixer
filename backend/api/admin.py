@@ -12,9 +12,9 @@ from backend.simulation.failure_triggers import (
 
 router = APIRouter()
 
-VALID_MACHINES = {"M-01", "M-02", "M-03"}
-VALID_MODES = {1, 2, 3}
-MACHINE_MODE_MAP = {"M-01": 1, "M-02": 2, "M-03": 3}
+VALID_MACHINES = {"M-01", "M-02", "M-03", "M-04"}
+VALID_MODES = {1, 2, 3, 4}
+MACHINE_MODE_MAP = {"M-01": 1, "M-02": 2, "M-03": 3, "M-04": 4}
 
 
 from typing import Optional, Dict, Any

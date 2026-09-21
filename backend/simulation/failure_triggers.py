@@ -147,6 +147,26 @@ class Mode3MotorFault:
     def health_impact(cls, t: float) -> float:
         return min(1.0, cls.current_delta(t) / 8.5)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# MODE 4 — M-04 Torque Calibration Station: Calibration Drift
+# Calibration deviation baseline drifts upward steadily past AS9100 quality threshold
+# ─────────────────────────────────────────────────────────────────────────────
+
+class Mode4CalibrationDrift:
+    """
+    M-04 failure trigger.
+    Accelerates the calibration offset drift past allowable AS9100 quality threshold.
+    """
+    drift_rate = 0.0004  # Drift per tick
+
+    @classmethod
+    def modified_baseline(cls, original_baseline: float, t: float) -> float:
+        return original_baseline + cls.drift_rate * t
+
+    @classmethod
+    def health_impact(cls, t: float) -> float:
+        return min(1.0, (cls.drift_rate * t) / 0.35)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Registry — used by simulator and admin route
@@ -156,6 +176,7 @@ TRIGGER_CLASSES = {
     ("M-01", 1): Mode1TorqueDrift,
     ("M-02", 2): Mode2BearingWear,
     ("M-03", 3): Mode3MotorFault,
+    ("M-04", 4): Mode4CalibrationDrift,
 }
 
 # Active triggers (machine_id → FailureTriggerState), managed by simulator
