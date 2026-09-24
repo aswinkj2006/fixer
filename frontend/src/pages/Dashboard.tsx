@@ -3,21 +3,16 @@ import type { FC } from 'react';
 import axios from 'axios';
 import type { Machine, FleetLeaderboardItem, FleetReliability } from '../types';
 import { MachineCard } from '../components/MachineCard';
-import { TriggerModal } from '../components/TriggerModal';
 import { FactoryFloor3DViewer } from '../components/FactoryFloor3DViewer';
 
 interface DashboardProps {
   machines: Machine[];
   onRefresh: () => void;
-  isModalOpen: boolean;
-  onCloseModal: () => void;
 }
 
 export const Dashboard: FC<DashboardProps> = ({
   machines,
   onRefresh,
-  isModalOpen,
-  onCloseModal,
 }) => {
   const [viewMode, setViewMode] = useState<'cards' | 'floor3d'>('cards');
   const [leaderboard, setLeaderboard] = useState<FleetLeaderboardItem[]>([]);
@@ -25,6 +20,7 @@ export const Dashboard: FC<DashboardProps> = ({
   const [reliability, setReliability] = useState<FleetReliability | null>(null);
   const [reliabilityWindow, setReliabilityWindow] = useState<number>(90);
   const [loadingReliability, setLoadingReliability] = useState(false);
+  const [showAllEvents, setShowAllEvents] = useState(false);
 
   const fetchLeaderboard = async () => {
     setLoadingLeaderboard(true);
@@ -67,7 +63,7 @@ export const Dashboard: FC<DashboardProps> = ({
 
   return (
     <main style={{ maxWidth: '1440px', margin: '0 auto', padding: '32px 28px' }}>
-      {/* Executive Fleet KPI Banner */}
+      {/* Fleet KPI Banner */}
       <section style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
@@ -76,7 +72,7 @@ export const Dashboard: FC<DashboardProps> = ({
       }}>
         <div className="glass-panel" style={{ padding: '22px 24px' }}>
           <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-            Fleet Health Index
+            Fleet Health
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
             <span style={{
@@ -87,7 +83,7 @@ export const Dashboard: FC<DashboardProps> = ({
               {avgHealth}%
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {avgHealth >= 85 ? 'Nominal Fleet Condition' : 'Anomalies Detected'}
+              {avgHealth >= 85 ? 'Nominal' : 'Anomalies Detected'}
             </span>
           </div>
           <div style={{
@@ -107,22 +103,19 @@ export const Dashboard: FC<DashboardProps> = ({
 
         <div className="glass-panel" style={{ padding: '22px 24px' }}>
           <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-            Overall Equipment Effectiveness (OEE)
+            Efficiency (OEE)
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
             <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-blue)' }}>
               {avgOee}%
             </span>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Target: 85%+ (World Class)</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Target: 85%+</span>
           </div>
-          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, marginTop: '8px' }}>
-            Availability × Performance × Quality composite
-          </p>
         </div>
 
         <div className="glass-panel" style={{ padding: '22px 24px' }}>
           <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-            Active Anomalies & Injections
+            Active Anomalies
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
             <span style={{
@@ -136,14 +129,11 @@ export const Dashboard: FC<DashboardProps> = ({
               {activeAlerts > 0 ? 'Urgent Review Required' : 'Zero Active Faults'}
             </span>
           </div>
-          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, marginTop: '8px' }}>
-            Monitored by local Ornstein-Uhlenbeck sensors
-          </p>
         </div>
 
         <div className="glass-panel" style={{ padding: '22px 24px' }}>
           <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-            Monitored Asset Fleet
+            Monitored Fleet
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
             <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--accent-violet)' }}>
@@ -151,21 +141,15 @@ export const Dashboard: FC<DashboardProps> = ({
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--status-healthy)', fontWeight: 600 }}>● 100% Online</span>
           </div>
-          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, marginTop: '8px' }}>
-            FANUC Robot, Haas CNC, Conveyor, Metrology
-          </p>
         </div>
       </section>
 
-      {/* Fleet Machinery Header & View Switcher */}
+      {/* Fleet Header & View Switcher */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '14px' }}>
         <div>
           <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-            Fleet Machinery & Digital Twins
+            Fleet Machinery
           </h2>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
-            Real-time multi-sensor prognostic scoring and 3D digital twin visualization per machine instance
-          </p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -214,12 +198,12 @@ export const Dashboard: FC<DashboardProps> = ({
           </div>
 
           <button className="btn-secondary" onClick={onRefresh} style={{ padding: '8px 16px', fontSize: '0.82rem' }}>
-            ↻ Refresh Fleet
+            ↻ Refresh
           </button>
         </div>
       </div>
 
-      {/* Machinery Content: Either 3D Factory Floor or Card Grid */}
+      {/* Machinery Content */}
       {viewMode === 'floor3d' ? (
         <section style={{ marginBottom: '48px' }}>
           <FactoryFloor3DViewer machines={machines} height="520px" />
@@ -237,23 +221,17 @@ export const Dashboard: FC<DashboardProps> = ({
         </section>
       )}
 
-      {/* ISO 14224 Fleet Reliability & Financial Impact */}
+      {/* Fleet Reliability & Cost Savings */}
       <section className="glass-panel" style={{ padding: '28px', marginBottom: '40px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '1.25rem' }}>⏱️</span>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', margin: 0 }}>
-                ISO 14224 Fleet Reliability & Financial Impact
-              </h2>
-            </div>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, marginTop: '4px' }}>
-              Automated MTBF, MTTR, Plant Availability %, and Downtime Cost Avoidance calculations
-            </p>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', margin: 0 }}>
+              Fleet Reliability & Cost Savings
+            </h2>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>ROLLING WINDOW:</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>WINDOW:</span>
             {[30, 90, 180].map((days) => (
               <button
                 key={days}
@@ -284,7 +262,7 @@ export const Dashboard: FC<DashboardProps> = ({
           </div>
         </div>
 
-        {/* 4 Reliability Metric Cards */}
+        {/* Reliability Metric Cards */}
         {reliability ? (
           <>
             <div style={{
@@ -311,12 +289,9 @@ export const Dashboard: FC<DashboardProps> = ({
                     {reliability.fleet_availability_pct}%
                   </span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    ({reliability.fleet_operating_hours} hrs runtime)
+                    ({reliability.fleet_operating_hours} hrs)
                   </span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
-                  {reliability.fleet_downtime_hours} hrs recorded downtime
-                </p>
               </div>
 
               <div style={{
@@ -326,7 +301,7 @@ export const Dashboard: FC<DashboardProps> = ({
                 border: '1px solid var(--border-card)',
               }}>
                 <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-                  Fleet MTBF (Operating Hours)
+                  MTBF
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
                   <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-blue)' }}>
@@ -334,9 +309,6 @@ export const Dashboard: FC<DashboardProps> = ({
                   </span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>hours</span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
-                  {reliability.fleet_failures_count} failure events in {reliability.window_days}d
-                </p>
               </div>
 
               <div style={{
@@ -346,7 +318,7 @@ export const Dashboard: FC<DashboardProps> = ({
                 border: '1px solid var(--border-card)',
               }}>
                 <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-                  Fleet MTTR (Repair Turnaround)
+                  MTTR
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
                   <span style={{
@@ -358,9 +330,6 @@ export const Dashboard: FC<DashboardProps> = ({
                   </span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>hours</span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
-                  Turnaround per closed ticket
-                </p>
               </div>
 
               <div style={{
@@ -370,27 +339,35 @@ export const Dashboard: FC<DashboardProps> = ({
                 border: '1px solid rgba(16, 185, 129, 0.25)',
               }}>
                 <span style={{ fontSize: '0.72rem', color: 'var(--status-healthy)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                  Downtime Cost Avoided
+                  Cost Savings
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
                   <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--status-healthy)' }}>
                     ${reliability.total_cost_avoided_usd.toLocaleString()}
                   </span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
-                  At $18.5k/hr downtime + AI fast triage
-                </p>
               </div>
             </div>
 
-            {/* Recent Downtime Log */}
+            {/* Recent Downtime Log — Top 5 with expand */}
             <div>
-              <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px' }}>
-                Recent Plant Downtime & Incident Log
-              </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+                  Recent Incidents
+                </h3>
+                {reliability.recent_fleet_events.length > 5 && (
+                  <button
+                    onClick={() => setShowAllEvents(!showAllEvents)}
+                    className="btn-secondary"
+                    style={{ padding: '4px 12px', fontSize: '0.75rem', fontWeight: 600 }}
+                  >
+                    {showAllEvents ? 'Show Top 5' : `View All (${reliability.recent_fleet_events.length})`}
+                  </button>
+                )}
+              </div>
               {reliability.recent_fleet_events.length === 0 ? (
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
-                  No downtime events logged in the selected {reliability.window_days}-day period.
+                  No incidents in the selected period.
                 </p>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
@@ -411,7 +388,7 @@ export const Dashboard: FC<DashboardProps> = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {reliability.recent_fleet_events.slice(0, 6).map((evt) => (
+                      {(showAllEvents ? reliability.recent_fleet_events : reliability.recent_fleet_events.slice(0, 5)).map((evt) => (
                         <tr key={evt.ticket_id} style={{ borderBottom: '1px solid var(--table-border)' }}>
                           <td style={{ padding: '10px 12px' }}>
                             <span style={{
@@ -469,40 +446,31 @@ export const Dashboard: FC<DashboardProps> = ({
           </>
         ) : (
           <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
-            Loading fleet reliability analytics...
+            Loading fleet reliability data...
           </p>
         )}
       </section>
 
-      {/* Fleet Recurring Faults Leaderboard */}
+      {/* Recurring Fault Patterns */}
       <section className="glass-panel" style={{ padding: '28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '1.2rem' }}>🧠</span>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', margin: 0 }}>
-                Fleet Recurring Faults Leaderboard (Tier 2 Semantic Memory)
-              </h2>
-            </div>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, marginTop: '4px' }}>
-              Surfaces patterns across the plant and identifies the longest-lasting historical remedies
-            </p>
-          </div>
-
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', margin: 0 }}>
+            Recurring Fault Patterns
+          </h2>
           <button
             className="btn-secondary"
             onClick={fetchLeaderboard}
             disabled={loadingLeaderboard}
             style={{ padding: '6px 14px', fontSize: '0.78rem' }}
           >
-            {loadingLeaderboard ? 'Scanning...' : '↻ Re-cluster'}
+            {loadingLeaderboard ? 'Scanning...' : '↻ Refresh'}
           </button>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {leaderboard.length === 0 ? (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '16px 0' }}>
-              No recurring fault clusters detected yet across Tier 2 collections.
+              No recurring fault patterns detected yet.
             </p>
           ) : (
             leaderboard.map((item) => (
@@ -560,7 +528,7 @@ export const Dashboard: FC<DashboardProps> = ({
                       )}
                     </div>
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
-                      💡 Longest-Lasting Fix: <strong style={{ color: 'var(--status-healthy)' }}>{item.longest_lasting_fix}</strong>
+                      💡 Best Fix: <strong style={{ color: 'var(--status-healthy)' }}>{item.longest_lasting_fix}</strong>
                     </p>
                   </div>
                 </div>
@@ -583,13 +551,6 @@ export const Dashboard: FC<DashboardProps> = ({
           )}
         </div>
       </section>
-
-      {/* Trigger Modal */}
-      <TriggerModal
-        isOpen={isModalOpen}
-        onClose={onCloseModal}
-        onTriggerChanged={onRefresh}
-      />
     </main>
   );
 };

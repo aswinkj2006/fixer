@@ -6,11 +6,11 @@ import type { Machine, SensorDataPoint } from './types';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './pages/Dashboard';
 import { MachineDetail } from './pages/MachineDetail';
+import { SimulationControl } from './pages/SimulationControl';
 
 export function App() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [wsConnected, setWsConnected] = useState<boolean>(false);
-  const [isTriggerModalOpen, setIsTriggerModalOpen] = useState<boolean>(false);
   const [realtimePoints, setRealtimePoints] = useState<Record<string, SensorDataPoint[]>>({});
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (localStorage.getItem('fixer_theme') as 'light' | 'dark') || 'dark';
@@ -97,38 +97,44 @@ export function App() {
     };
   }, []);
 
-  const activeTriggerCount = machines.filter((m) => m.trigger_active).length;
-
   return (
     <BrowserRouter>
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Navbar
-          wsConnected={wsConnected}
-          onOpenTriggerModal={() => setIsTriggerModalOpen(true)}
-          activeTriggerCount={activeTriggerCount}
-          theme={theme}
-          onToggleTheme={toggleTheme}
-        />
+        <Routes>
+          {/* Simulation page has NO navbar — standalone utility page */}
+          <Route path="/sim" element={<SimulationControl />} />
 
-        <div style={{ flex: 1 }}>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <Dashboard
-                  machines={machines}
-                  onRefresh={fetchMachines}
-                  isModalOpen={isTriggerModalOpen}
-                  onCloseModal={() => setIsTriggerModalOpen(false)}
+          {/* Main app routes with Navbar */}
+          <Route
+            path="*"
+            element={
+              <>
+                <Navbar
+                  wsConnected={wsConnected}
+                  theme={theme}
+                  onToggleTheme={toggleTheme}
                 />
-              }
-            />
-            <Route
-              path="/machine/:id"
-              element={<MachineDetail realtimePoints={realtimePoints} />}
-            />
-          </Routes>
-        </div>
+                <div style={{ flex: 1 }}>
+                  <Routes>
+                    <Route
+                      path="/"
+                      element={
+                        <Dashboard
+                          machines={machines}
+                          onRefresh={fetchMachines}
+                        />
+                      }
+                    />
+                    <Route
+                      path="/machine/:id"
+                      element={<MachineDetail realtimePoints={realtimePoints} />}
+                    />
+                  </Routes>
+                </div>
+              </>
+            }
+          />
+        </Routes>
       </div>
     </BrowserRouter>
   );

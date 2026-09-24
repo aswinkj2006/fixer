@@ -46,6 +46,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# Live Local Databases (Unstable during server runs)
+backend/database/fixer.db
+data/chroma_db/
+
 # OS & Editors
 .DS_Store
 Thumbs.db
@@ -53,3 +57,8 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Temporary & Build Files
+studybook.html
+test.pptx
+*.tmp

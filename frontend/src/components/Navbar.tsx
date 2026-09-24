@@ -3,16 +3,12 @@ import { Link } from 'react-router-dom';
 
 interface NavbarProps {
   wsConnected: boolean;
-  onOpenTriggerModal: () => void;
-  activeTriggerCount: number;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
 }
 
 export const Navbar: FC<NavbarProps> = ({
   wsConnected,
-  onOpenTriggerModal,
-  activeTriggerCount,
   theme,
   onToggleTheme,
 }) => {
@@ -66,7 +62,7 @@ export const Navbar: FC<NavbarProps> = ({
             </span>
           </div>
           <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: 0 }}>
-            Offline Prognostics & Multimodal Machine Advisory
+            Predictive Maintenance & Machine Advisory
           </p>
         </div>
       </Link>
@@ -90,7 +86,7 @@ export const Navbar: FC<NavbarProps> = ({
           <span>{wsConnected ? 'Live Telemetry' : 'Connecting...'}</span>
         </div>
 
-        {/* Light / Dark Mode Toggle Button */}
+        {/* Light / Dark Mode Toggle */}
         <button
           id="btn-theme-toggle"
           type="button"
@@ -101,29 +97,6 @@ export const Navbar: FC<NavbarProps> = ({
         >
           <span>{theme === 'dark' ? '☀️' : '🌙'}</span>
           <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
-        </button>
-
-        {/* Anomaly trigger button */}
-        <button
-          id="btn-open-triggers"
-          type="button"
-          onClick={onOpenTriggerModal}
-          className={activeTriggerCount > 0 ? 'btn-danger' : 'btn-secondary'}
-          style={{ padding: '8px 16px', fontSize: '0.82rem' }}
-        >
-          <span>⚡ Anomaly Simulator</span>
-          {activeTriggerCount > 0 && (
-            <span style={{
-              background: '#ffffff',
-              color: '#dc2626',
-              borderRadius: 'var(--btn-radius)',
-              padding: '1px 6px',
-              fontSize: '0.72rem',
-              fontWeight: 800,
-            }}>
-              {activeTriggerCount}
-            </span>
-          )}
         </button>
       </div>
     </header>

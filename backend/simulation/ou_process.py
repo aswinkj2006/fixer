@@ -30,30 +30,31 @@ def ou_step(
     rng: Optional[np.random.Generator] = None,
 ) -> float:
     """
-    One step of the Ornstein-Uhlenbeck process:
-        dX = theta * (baseline - X) * dt + sigma * dW
-    where dW ~ N(0, sqrt(dt)).
-
-    Args:
-        current_value: X_t
-        baseline: long-term mean (mu)
-        theta: mean-reversion strength (higher = tighter / steadier signal)
-        sigma: noise magnitude
-        dt: time step in simulation time units
-        rng: numpy RNG instance (creates one if None — prefer passing one for reproducibility)
-
-    Returns:
-        X_{t+1}
+    Exact analytical step of the Ornstein-Uhlenbeck process:
+        X_{t+dt} = baseline + (X_t - baseline) * exp(-theta * dt) + sigma_eff * W
+    Unconditionally stable for any dt, eliminating numerical Euler divergence.
     """
     if rng is None:
         rng = np.random.default_rng()
-    drift = theta * (baseline - current_value) * dt
-    diffusion = sigma * rng.standard_normal() * np.sqrt(dt)
-    result = current_value + drift + diffusion
-    # Guard against overflow / NaN during extreme failure modes
+
+    # Guard against invalid incoming current_value
+    if not np.isfinite(current_value) or abs(current_value) > 1e8:
+        current_value = baseline
+
+    if theta > 1e-6:
+        decay = float(np.exp(-min(theta * dt, 50.0)))
+        denom = 2.0 * theta
+        var = (1.0 - np.exp(-min(2.0 * theta * dt, 50.0))) / denom
+        sigma_eff = float(sigma * np.sqrt(max(var, 0.0)))
+    else:
+        decay = 1.0
+        sigma_eff = float(sigma * np.sqrt(dt))
+
+    noise = float(rng.standard_normal())
+    result = baseline + (current_value - baseline) * decay + sigma_eff * noise
     if not np.isfinite(result):
         result = baseline
-    return result
+    return float(result)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
