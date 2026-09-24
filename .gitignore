@@ -62,3 +62,8 @@ Thumbs.db
 studybook.html
 test.pptx
 *.tmp
+
+# Local Migration & Handover Files (Ignored for clean dual-workflow)
+*HANDOVER*
+MIGRATION_HANDOVER.md
+SESSION_HANDOVER.md
