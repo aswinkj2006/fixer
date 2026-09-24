@@ -80,18 +80,3 @@ npm run dev
 ```
 
 ---
-
-## 👥 Concurrent Team Collaboration (Backend + Frontend)
-
-To ensure backend and UI developers can work simultaneously without merge conflicts:
-- **Backend Branch**: `feat/backend-rag` (Only touches `backend/`, `data/`, `scripts/`)
-- **Frontend Branch**: `feat/frontend-ui` (Only touches `frontend/`)
-- **Sync Protocol**: Update `AGENT_SYNC.md` on every commit with what changed so both developers and AI agents stay in lockstep.
-
----
-
-## 🏆 HackfiniX 2026 Competition Focus
-- **Track 01**: Smart Manufacturing & Industry 5.0
-- **Track 02**: Human–AI Collaboration
-- **Special Award**: Best UI/UX (₹10,000)
-- **Incubation Support**: Up to ₹10,00,000
